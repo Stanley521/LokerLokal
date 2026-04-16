@@ -1,4 +1,4 @@
-#Thu Apr 16 17:47:11 WIB 2026
+#Thu Apr 16 18:00:37 WIB 2026
 base.0=/Users/stanleywong2197gmail.com/AndroidStudioProjects/LokerLokal/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 base.1=/Users/stanleywong2197gmail.com/AndroidStudioProjects/LokerLokal/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
 base.2=/Users/stanleywong2197gmail.com/AndroidStudioProjects/LokerLokal/app/build/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex
