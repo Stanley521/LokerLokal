@@ -9,6 +9,8 @@
         android:targetSdkVersion="35" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <!-- Include required permissions for Google Maps API to run. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -44,7 +46,7 @@
         android:theme="@style/Theme.LokerLokal" >
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC9ve4ktzO3tUg1pFALcXDWcDi7-J8K1W4" />
+            android:value="AIzaSyCt57gX4tm4u5iS_fD4v53El97HTB_nOak" />
 
         <activity
             android:name="com.example.lokerlokal.MainActivity"

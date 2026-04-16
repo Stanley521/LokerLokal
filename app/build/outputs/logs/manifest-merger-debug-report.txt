@@ -1,16 +1,16 @@
 -- Merging decision tree log ---
 meta-data#com.google.android.geo.API_KEY
-INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:18:9-20:47
+INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:20:9-22:47
 	android:value
 		INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:20:13-44
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:22:13-44
 	android:name
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:19:13-58
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:21:13-58
 manifest
-ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:2:1-34:12
-INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:2:1-34:12
-INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:2:1-34:12
-INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:2:1-34:12
+ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:2:1-36:12
+INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:2:1-36:12
+INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:2:1-36:12
+INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:2:1-36:12
 MERGED from [androidx.databinding:viewbinding:8.10.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\a677bedc8a3e85de29ff6cddaf8c9f91\transformed\viewbinding-8.10.1\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.navigation:navigation-runtime-android:2.9.7] C:\Users\wongp\.gradle\caches\8.11.1\transforms\5473d7803c7e7b5a1abcb898fb182d38\transformed\navigation-runtime-release\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-common-android:2.9.7] C:\Users\wongp\.gradle\caches\8.11.1\transforms\f2baae2ee900fa0858927a95bec5ba39\transformed\navigation-common-release\AndroidManifest.xml:17:1-22:12
@@ -24,9 +24,10 @@ MERGED from [androidx.appcompat:appcompat-resources:1.7.1] C:\Users\wongp\.gradl
 MERGED from [androidx.appcompat:appcompat:1.7.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\1dda6d41f039a8cf70f60aabdd5bd608\transformed\appcompat-1.7.1\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c17b2cd423c0b7a78c73622e9365f3d5\transformed\play-services-maps-18.2.0\AndroidManifest.xml:17:1-44:12
 MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\7801f664dbb1df70ebfa5cf6a06994b5\transformed\viewpager2-1.0.0\AndroidManifest.xml:17:1-24:12
-MERGED from [com.google.android.gms:play-services-base:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\63d42ec308b2361c035422e5e292fbb1\transformed\play-services-base-18.0.1\AndroidManifest.xml:16:1-24:12
-MERGED from [com.google.android.gms:play-services-tasks:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c7bc3eb270a90a742b93761be86fa429\transformed\play-services-tasks-18.0.1\AndroidManifest.xml:2:1-6:12
-MERGED from [com.google.android.gms:play-services-basement:18.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\590388db7dc9c1fd541fa9bdd2987ad4\transformed\play-services-basement-18.0.0\AndroidManifest.xml:16:1-26:12
+MERGED from [com.google.android.gms:play-services-location:21.3.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\e3a798d44423fc2cf05836e928e1dd39\transformed\play-services-location-21.3.0\AndroidManifest.xml:2:1-8:12
+MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\ff1ae7073255fb638282586a0a355011\transformed\play-services-base-18.5.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\432eb3440857a6b59cd370827709f74e\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:2:1-5:12
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\d5dc5d2f37461db5f4f17eff5215f967\transformed\play-services-basement-18.4.0\AndroidManifest.xml:2:1-9:12
 MERGED from [androidx.fragment:fragment-ktx:1.6.2] C:\Users\wongp\.gradle\caches\8.11.1\transforms\e86b63e901666b5dc5428e52305882c3\transformed\fragment-ktx-1.6.2\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.fragment:fragment:1.6.2] C:\Users\wongp\.gradle\caches\8.11.1\transforms\a992e63af70eec8f44b4a6541f3dc071\transformed\fragment-1.6.2\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.activity:activity-ktx:1.8.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\0e9e0a1571aa6ded43be5e07cc7fc3a1\transformed\activity-ktx-1.8.0\AndroidManifest.xml:2:1-7:12
@@ -87,21 +88,31 @@ MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\wongp\.g
 MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c17b2cd423c0b7a78c73622e9365f3d5\transformed\play-services-maps-18.2.0\AndroidManifest.xml:24:5-67
 	android:name
 		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:5:22-64
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:6:5-79
+	android:name
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:6:22-76
+uses-permission#android.permission.ACCESS_COARSE_LOCATION
+ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:7:5-81
+	android:name
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:7:22-78
 application
-ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:7:5-32:19
-INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:7:5-32:19
+ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:9:5-34:19
+INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:9:5-34:19
 MERGED from [com.google.android.material:material:1.13.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\5ac6bc10f3d729a24d7a86a1efbc2427\transformed\material-1.13.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.13.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\5ac6bc10f3d729a24d7a86a1efbc2427\transformed\material-1.13.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.2.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\abbb0bd820f6f083d6a9b95a7ea1b7f9\transformed\constraintlayout-2.2.1\AndroidManifest.xml:7:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.2.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\abbb0bd820f6f083d6a9b95a7ea1b7f9\transformed\constraintlayout-2.2.1\AndroidManifest.xml:7:5-20
 MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c17b2cd423c0b7a78c73622e9365f3d5\transformed\play-services-maps-18.2.0\AndroidManifest.xml:36:5-42:19
 MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c17b2cd423c0b7a78c73622e9365f3d5\transformed\play-services-maps-18.2.0\AndroidManifest.xml:36:5-42:19
-MERGED from [com.google.android.gms:play-services-base:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\63d42ec308b2361c035422e5e292fbb1\transformed\play-services-base-18.0.1\AndroidManifest.xml:19:5-23:19
-MERGED from [com.google.android.gms:play-services-base:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\63d42ec308b2361c035422e5e292fbb1\transformed\play-services-base-18.0.1\AndroidManifest.xml:19:5-23:19
-MERGED from [com.google.android.gms:play-services-tasks:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c7bc3eb270a90a742b93761be86fa429\transformed\play-services-tasks-18.0.1\AndroidManifest.xml:5:5-20
-MERGED from [com.google.android.gms:play-services-tasks:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c7bc3eb270a90a742b93761be86fa429\transformed\play-services-tasks-18.0.1\AndroidManifest.xml:5:5-20
-MERGED from [com.google.android.gms:play-services-basement:18.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\590388db7dc9c1fd541fa9bdd2987ad4\transformed\play-services-basement-18.0.0\AndroidManifest.xml:20:5-24:19
-MERGED from [com.google.android.gms:play-services-basement:18.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\590388db7dc9c1fd541fa9bdd2987ad4\transformed\play-services-basement-18.0.0\AndroidManifest.xml:20:5-24:19
+MERGED from [com.google.android.gms:play-services-location:21.3.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\e3a798d44423fc2cf05836e928e1dd39\transformed\play-services-location-21.3.0\AndroidManifest.xml:6:5-20
+MERGED from [com.google.android.gms:play-services-location:21.3.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\e3a798d44423fc2cf05836e928e1dd39\transformed\play-services-location-21.3.0\AndroidManifest.xml:6:5-20
+MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\ff1ae7073255fb638282586a0a355011\transformed\play-services-base-18.5.0\AndroidManifest.xml:4:5-6:19
+MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\ff1ae7073255fb638282586a0a355011\transformed\play-services-base-18.5.0\AndroidManifest.xml:4:5-6:19
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\432eb3440857a6b59cd370827709f74e\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:4:5-20
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\432eb3440857a6b59cd370827709f74e\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:4:5-20
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\d5dc5d2f37461db5f4f17eff5215f967\transformed\play-services-basement-18.4.0\AndroidManifest.xml:5:5-7:19
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\d5dc5d2f37461db5f4f17eff5215f967\transformed\play-services-basement-18.4.0\AndroidManifest.xml:5:5-7:19
 MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\365075f5230afb5c64af3e3055573582\transformed\emoji2-1.3.0\AndroidManifest.xml:23:5-33:19
 MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\365075f5230afb5c64af3e3055573582\transformed\emoji2-1.3.0\AndroidManifest.xml:23:5-33:19
 MERGED from [androidx.window:window:1.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\909057cadb6e2d9a8f097feccff4c77b\transformed\window-1.0.0\AndroidManifest.xml:24:5-31:19
@@ -121,41 +132,41 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\wongp\.gradle\cach
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.18.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\64385bbcc99f36b0610f553b3094a200\transformed\core-1.18.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:14:9-35
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:16:9-35
 	android:label
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:12:9-41
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:14:9-41
 	android:fullBackupContent
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:10:9-54
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:12:9-54
 	android:roundIcon
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:13:9-54
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:15:9-54
 	tools:targetApi
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:16:9-29
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:18:9-29
 	android:icon
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:11:9-43
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:13:9-43
 	android:allowBackup
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:8:9-35
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:10:9-35
 	android:theme
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:15:9-48
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:17:9-48
 	android:dataExtractionRules
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:9:9-65
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:11:9-65
 activity#com.example.lokerlokal.MainActivity
-ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:22:9-31:20
+ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:24:9-33:20
 	android:label
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:25:13-45
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:27:13-45
 	android:exported
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:24:13-36
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:26:13-36
 	android:name
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:23:13-41
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:25:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:26:13-30:29
+ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:28:13-32:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:27:17-69
+ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:29:17-69
 	android:name
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:27:25-66
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:29:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:29:17-77
+ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:31:17-77
 	android:name
-		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:29:27-74
+		ADDED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml:31:27-74
 uses-sdk
 INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\wongp\AndroidStudioProjects\LokerLokal\app\src\main\AndroidManifest.xml
@@ -186,12 +197,14 @@ MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\wongp\.g
 MERGED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c17b2cd423c0b7a78c73622e9365f3d5\transformed\play-services-maps-18.2.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\7801f664dbb1df70ebfa5cf6a06994b5\transformed\viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.viewpager2:viewpager2:1.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\7801f664dbb1df70ebfa5cf6a06994b5\transformed\viewpager2-1.0.0\AndroidManifest.xml:20:5-22:41
-MERGED from [com.google.android.gms:play-services-base:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\63d42ec308b2361c035422e5e292fbb1\transformed\play-services-base-18.0.1\AndroidManifest.xml:18:5-43
-MERGED from [com.google.android.gms:play-services-base:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\63d42ec308b2361c035422e5e292fbb1\transformed\play-services-base-18.0.1\AndroidManifest.xml:18:5-43
-MERGED from [com.google.android.gms:play-services-tasks:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c7bc3eb270a90a742b93761be86fa429\transformed\play-services-tasks-18.0.1\AndroidManifest.xml:4:5-43
-MERGED from [com.google.android.gms:play-services-tasks:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c7bc3eb270a90a742b93761be86fa429\transformed\play-services-tasks-18.0.1\AndroidManifest.xml:4:5-43
-MERGED from [com.google.android.gms:play-services-basement:18.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\590388db7dc9c1fd541fa9bdd2987ad4\transformed\play-services-basement-18.0.0\AndroidManifest.xml:18:5-43
-MERGED from [com.google.android.gms:play-services-basement:18.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\590388db7dc9c1fd541fa9bdd2987ad4\transformed\play-services-basement-18.0.0\AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-location:21.3.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\e3a798d44423fc2cf05836e928e1dd39\transformed\play-services-location-21.3.0\AndroidManifest.xml:4:5-44
+MERGED from [com.google.android.gms:play-services-location:21.3.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\e3a798d44423fc2cf05836e928e1dd39\transformed\play-services-location-21.3.0\AndroidManifest.xml:4:5-44
+MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\ff1ae7073255fb638282586a0a355011\transformed\play-services-base-18.5.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\ff1ae7073255fb638282586a0a355011\transformed\play-services-base-18.5.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\432eb3440857a6b59cd370827709f74e\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\432eb3440857a6b59cd370827709f74e\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\d5dc5d2f37461db5f4f17eff5215f967\transformed\play-services-basement-18.4.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\d5dc5d2f37461db5f4f17eff5215f967\transformed\play-services-basement-18.4.0\AndroidManifest.xml:3:5-44
 MERGED from [androidx.fragment:fragment-ktx:1.6.2] C:\Users\wongp\.gradle\caches\8.11.1\transforms\e86b63e901666b5dc5428e52305882c3\transformed\fragment-ktx-1.6.2\AndroidManifest.xml:20:5-44
 MERGED from [androidx.fragment:fragment-ktx:1.6.2] C:\Users\wongp\.gradle\caches\8.11.1\transforms\e86b63e901666b5dc5428e52305882c3\transformed\fragment-ktx-1.6.2\AndroidManifest.xml:20:5-44
 MERGED from [androidx.fragment:fragment:1.6.2] C:\Users\wongp\.gradle\caches\8.11.1\transforms\a992e63af70eec8f44b4a6541f3dc071\transformed\fragment-1.6.2\AndroidManifest.xml:20:5-44
@@ -307,19 +320,19 @@ ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\wongp\.gr
 	android:name
 		ADDED from [com.google.android.gms:play-services-maps:18.2.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\c17b2cd423c0b7a78c73622e9365f3d5\transformed\play-services-maps-18.2.0\AndroidManifest.xml:40:13-50
 activity#com.google.android.gms.common.api.GoogleApiActivity
-ADDED from [com.google.android.gms:play-services-base:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\63d42ec308b2361c035422e5e292fbb1\transformed\play-services-base-18.0.1\AndroidManifest.xml:20:9-22:45
+ADDED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\ff1ae7073255fb638282586a0a355011\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:9-173
 	android:exported
-		ADDED from [com.google.android.gms:play-services-base:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\63d42ec308b2361c035422e5e292fbb1\transformed\play-services-base-18.0.1\AndroidManifest.xml:22:19-43
+		ADDED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\ff1ae7073255fb638282586a0a355011\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:146-170
 	android:theme
-		ADDED from [com.google.android.gms:play-services-base:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\63d42ec308b2361c035422e5e292fbb1\transformed\play-services-base-18.0.1\AndroidManifest.xml:21:19-78
+		ADDED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\ff1ae7073255fb638282586a0a355011\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:86-145
 	android:name
-		ADDED from [com.google.android.gms:play-services-base:18.0.1] C:\Users\wongp\.gradle\caches\8.11.1\transforms\63d42ec308b2361c035422e5e292fbb1\transformed\play-services-base-18.0.1\AndroidManifest.xml:20:19-85
+		ADDED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\ff1ae7073255fb638282586a0a355011\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:19-85
 meta-data#com.google.android.gms.version
-ADDED from [com.google.android.gms:play-services-basement:18.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\590388db7dc9c1fd541fa9bdd2987ad4\transformed\play-services-basement-18.0.0\AndroidManifest.xml:21:9-23:69
+ADDED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\d5dc5d2f37461db5f4f17eff5215f967\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
 	android:value
-		ADDED from [com.google.android.gms:play-services-basement:18.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\590388db7dc9c1fd541fa9bdd2987ad4\transformed\play-services-basement-18.0.0\AndroidManifest.xml:23:13-66
+		ADDED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\d5dc5d2f37461db5f4f17eff5215f967\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
 	android:name
-		ADDED from [com.google.android.gms:play-services-basement:18.0.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\590388db7dc9c1fd541fa9bdd2987ad4\transformed\play-services-basement-18.0.0\AndroidManifest.xml:22:13-58
+		ADDED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\d5dc5d2f37461db5f4f17eff5215f967\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
 provider#androidx.startup.InitializationProvider
 ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\365075f5230afb5c64af3e3055573582\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
 MERGED from [androidx.lifecycle:lifecycle-process:2.10.0] C:\Users\wongp\.gradle\caches\8.11.1\transforms\6967b3b4ac4c2f1fb4e35e41a80c7fce\transformed\lifecycle-process-2.10.0\AndroidManifest.xml:24:9-32:20
