@@ -4,7 +4,7 @@
             "outputFile": "com.example.lokerlokal.app-mergeDebugResources-49:/values-v25/values-v25.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\wongp\\.gradle\\caches\\8.11.1\\transforms\\1dda6d41f039a8cf70f60aabdd5bd608\\transformed\\appcompat-1.7.1\\res\\values-v25\\values-v25.xml",
+                    "source": "/Users/stanleywong2197gmail.com/.gradle/caches/8.11.1/transforms/1dda6d41f039a8cf70f60aabdd5bd608/transformed/appcompat-1.7.1/res/values-v25/values-v25.xml",
                     "from": {
                         "startLines": "2,3,4,6",
                         "startColumns": "4,4,4,4",

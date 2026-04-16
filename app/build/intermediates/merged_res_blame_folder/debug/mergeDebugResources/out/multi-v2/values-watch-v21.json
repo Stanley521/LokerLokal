@@ -4,7 +4,7 @@
             "outputFile": "com.example.lokerlokal.app-mergeDebugResources-49:/values-watch-v21/values-watch-v21.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\wongp\\.gradle\\caches\\8.11.1\\transforms\\1dda6d41f039a8cf70f60aabdd5bd608\\transformed\\appcompat-1.7.1\\res\\values-watch-v21\\values-watch-v21.xml",
+                    "source": "/Users/stanleywong2197gmail.com/.gradle/caches/8.11.1/transforms/1dda6d41f039a8cf70f60aabdd5bd608/transformed/appcompat-1.7.1/res/values-watch-v21/values-watch-v21.xml",
                     "from": {
                         "startLines": "2,6,10",
                         "startColumns": "4,4,4",

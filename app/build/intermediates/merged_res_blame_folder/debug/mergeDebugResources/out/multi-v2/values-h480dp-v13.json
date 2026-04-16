@@ -4,7 +4,7 @@
             "outputFile": "com.example.lokerlokal.app-mergeDebugResources-49:/values-h480dp-v13/values-h480dp-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\wongp\\.gradle\\caches\\8.11.1\\transforms\\5ac6bc10f3d729a24d7a86a1efbc2427\\transformed\\material-1.13.0\\res\\values-h480dp-v13\\values-h480dp-v13.xml",
+                    "source": "/Users/stanleywong2197gmail.com/.gradle/caches/8.11.1/transforms/5ac6bc10f3d729a24d7a86a1efbc2427/transformed/material-1.13.0/res/values-h480dp-v13/values-h480dp-v13.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

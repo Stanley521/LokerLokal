@@ -4,7 +4,7 @@
             "outputFile": "com.example.lokerlokal.app-mergeDebugResources-49:/values-v23/values-v23.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\wongp\\.gradle\\caches\\8.11.1\\transforms\\3bd3efccfc11a03c7bdd12a12c719eb6\\transformed\\cardview-1.0.0\\res\\values-v23\\values-v23.xml",
+                    "source": "/Users/stanleywong2197gmail.com/.gradle/caches/8.11.1/transforms/3bd3efccfc11a03c7bdd12a12c719eb6/transformed/cardview-1.0.0/res/values-v23/values-v23.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -23,7 +23,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\wongp\\.gradle\\caches\\8.11.1\\transforms\\5ac6bc10f3d729a24d7a86a1efbc2427\\transformed\\material-1.13.0\\res\\values-v23\\values-v23.xml",
+                    "source": "/Users/stanleywong2197gmail.com/.gradle/caches/8.11.1/transforms/5ac6bc10f3d729a24d7a86a1efbc2427/transformed/material-1.13.0/res/values-v23/values-v23.xml",
                     "from": {
                         "startLines": "2,5,9,13,16,19,22,25,28,32",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",
@@ -42,7 +42,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\wongp\\.gradle\\caches\\8.11.1\\transforms\\1dda6d41f039a8cf70f60aabdd5bd608\\transformed\\appcompat-1.7.1\\res\\values-v23\\values-v23.xml",
+                    "source": "/Users/stanleywong2197gmail.com/.gradle/caches/8.11.1/transforms/1dda6d41f039a8cf70f60aabdd5bd608/transformed/appcompat-1.7.1/res/values-v23/values-v23.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,20,34,35,36,39,43,44,45,46",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
