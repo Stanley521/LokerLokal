@@ -1,5 +1,6 @@
 package com.example.lokerlokal.data.remote
 
+import android.util.Log
 import com.example.lokerlokal.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,12 +20,16 @@ data class NearbyJob(
 
 object SupabaseJobsService {
 
+    private const val TAG = "SupabaseJobsService"
+    private const val BODY_PREVIEW_MAX_LENGTH = 500
+
     suspend fun getNearbyJobs(lat: Double, lng: Double, radius: Int = 2000): List<NearbyJob> =
         withContext(Dispatchers.IO) {
             val supabaseUrl = BuildConfig.SUPABASE_URL.trim()
             val supabaseAnonKey = BuildConfig.SUPABASE_ANON_KEY.trim()
 
             if (supabaseUrl.isBlank() || supabaseAnonKey.isBlank()) {
+                logDebug("Missing Supabase configuration in BuildConfig")
                 throw IllegalStateException(
                     "SUPABASE_URL / SUPABASE_ANON_KEY is empty. Add them in local.properties"
                 )
@@ -36,6 +41,8 @@ object SupabaseJobsService {
                 .put("lng", lng)
                 .put("radius", radius)
                 .toString()
+
+            logDebug("Request -> POST $endpoint payload=$payload")
 
             val connection = (endpoint.openConnection() as HttpURLConnection).apply {
                 requestMethod = "POST"
@@ -56,15 +63,25 @@ object SupabaseJobsService {
                     ?.use { it.readText() }
                     .orEmpty()
 
+                logDebug(
+                    "Response <- code=$code success=${code in 200..299} body=${body.toBodyPreview()}"
+                )
+
                 if (code !in 200..299) {
+                    Log.e(
+                        TAG,
+                        "Supabase RPC failed. endpoint=$endpoint code=$code body=${body.toBodyPreview()}"
+                    )
                     throw IOException("Supabase RPC failed ($code): $body")
                 }
 
                 if (body.isBlank()) {
+                    logDebug("Response body is empty; returning no jobs")
                     return@withContext emptyList()
                 }
 
                 val jsonArray = JSONArray(body)
+                logDebug("Parsed ${jsonArray.length()} jobs from Supabase")
                 return@withContext List(jsonArray.length()) { index ->
                     jsonArray.optJSONObject(index)?.toNearbyJob(index)
                         ?: NearbyJob(
@@ -79,6 +96,22 @@ object SupabaseJobsService {
                 connection.disconnect()
             }
         }
+
+    private fun logDebug(message: String) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, message)
+        }
+    }
+
+    private fun String.toBodyPreview(maxLength: Int = BODY_PREVIEW_MAX_LENGTH): String {
+        val normalized = replace(Regex("\\s+"), " ").trim()
+        if (normalized.isEmpty()) return "<empty>"
+        return if (normalized.length <= maxLength) {
+            normalized
+        } else {
+            normalized.take(maxLength) + "…"
+        }
+    }
 
     private fun JSONObject.toNearbyJob(index: Int): NearbyJob {
         val parsedLat = optDoubleAny("latitude", "lat", "job_latitude")

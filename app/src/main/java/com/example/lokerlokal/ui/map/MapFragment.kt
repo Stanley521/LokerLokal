@@ -5,11 +5,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -21,7 +19,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.launch
 
 class MapFragment : Fragment(R.layout.fragment_map) {
@@ -50,6 +48,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             val hasPermission = result[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
                 result[Manifest.permission.ACCESS_COARSE_LOCATION] == true
             if (hasPermission) {
+                // User granted permission; retry location + fetch
                 initLocation()
             } else {
                 setRefreshing(false)
@@ -72,7 +71,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private var refreshing = false
 
     private var googleMap: GoogleMap? = null
-    private var sheetDialog: BottomSheetDialog? = null
+    private var sheetBehavior: BottomSheetBehavior<View>? = null
     private var swipeRefreshLayout: SwipeRefreshLayout? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,6 +79,13 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
         swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout).apply {
             setOnRefreshListener { onRefresh() }
+        }
+
+        // Wire up the activity-level bottom sheet
+        val sheetView = requireActivity().findViewById<View>(R.id.bottom_sheet)
+        sheetBehavior = BottomSheetBehavior.from(sheetView).also { behavior ->
+            behavior.isHideable = true
+            behavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -98,6 +104,18 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     11f,
                 )
             )
+            // Immediately try to fetch jobs from default region while waiting for location
+            lifecycleScope.launch {
+                try {
+                    val nearbyJobs = SupabaseJobsService.getNearbyJobs(region.latitude, region.longitude)
+                    if (nearbyJobs.isNotEmpty()) {
+                        onJobsChanged(nearbyJobs.map { Job(it.id, it.title, it.company, it.latitude, it.longitude) })
+                    }
+                } catch (e: Exception) {
+                    // Silently skip initial fetch; user location will be more accurate
+                }
+            }
+            // Then init location to get user's actual position
             initLocation()
         }
     }
@@ -184,44 +202,20 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun openSheet() {
         val job = selectedJob ?: return
-        val context = requireContext()
-
-        val container = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(32)
-        }
-
-        val titleView = TextView(context).apply {
-            text = job.title
-            textSize = 20f
-        }
-
-        val companyView = TextView(context).apply {
-            text = getString(
-                R.string.map_job_company_coordinates,
-                job.company,
-                job.latitude,
-                job.longitude,
-            )
-            textSize = 14f
-        }
-
-        container.addView(titleView)
-        container.addView(companyView)
-
-        sheetDialog?.dismiss()
-        sheetDialog = BottomSheetDialog(context).apply {
-            setContentView(container)
-            setOnDismissListener { closeSheet() }
-            show()
-        }
+        val activity = requireActivity()
+        val sheetView = activity.findViewById<View>(R.id.bottom_sheet)
+        sheetView.findViewById<TextView>(R.id.job_title)?.text = job.title
+        sheetView.findViewById<TextView>(R.id.job_company)?.text = getString(
+            R.string.map_job_company_coordinates,
+            job.company,
+            job.latitude,
+            job.longitude,
+        )
+        sheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun closeSheet() {
-        if (sheetDialog?.isShowing == true) {
-            sheetDialog?.dismiss()
-        }
-        sheetDialog = null
+        sheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
         selectedJob = null
     }
 
@@ -275,7 +269,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     override fun onDestroyView() {
         readyDelayRunnable?.let(mainHandler::removeCallbacks)
         readyDelayRunnable = null
-        closeSheet()
+        sheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        sheetBehavior = null
         swipeRefreshLayout?.setOnRefreshListener(null)
         swipeRefreshLayout = null
         googleMap = null
