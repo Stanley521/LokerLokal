@@ -1,5 +1,8 @@
 import java.util.Properties
 
+fun asBuildConfigString(value: String): String =
+    "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -25,6 +28,16 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders["MAPS_API_KEY"] = localProperties.getProperty("MAPS_API_KEY", "")
+        buildConfigField(
+            "String",
+            "SUPABASE_URL",
+            asBuildConfigString(localProperties.getProperty("SUPABASE_URL", ""))
+        )
+        buildConfigField(
+            "String",
+            "SUPABASE_ANON_KEY",
+            asBuildConfigString(localProperties.getProperty("SUPABASE_ANON_KEY", ""))
+        )
     }
 
     buildTypes {
@@ -44,6 +57,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         viewBinding = true
     }
 }
@@ -54,6 +68,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)

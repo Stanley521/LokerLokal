@@ -4,4 +4,5 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_map">Map</string>
     <string name="title_notifications">Notifications</string>
+    <string name="map_job_company_coordinates">%1$s (%2$.6f, %3$.6f)</string>
 </resources>

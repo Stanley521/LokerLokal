@@ -1,6 +1,7 @@
 package com.example.lokerlokal.util
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -10,9 +11,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LastLocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.Task
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.resume
@@ -106,17 +107,21 @@ class LocationHelper(private val context: Context) {
                 .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
                 .build()
 
-            fusedClient.getCurrentLocation(request, null)
-                .addOnSuccessListener { location ->
-                    if (location != null) {
-                        cont.resume(location)
-                    } else {
-                        cont.resumeWithException(Exception("Location unavailable"))
+            try {
+                getCurrentLocationTask(request)
+                    .addOnSuccessListener { location ->
+                        if (location != null) {
+                            cont.resume(location)
+                        } else {
+                            cont.resumeWithException(Exception("Location unavailable"))
+                        }
                     }
-                }
-                .addOnFailureListener { e ->
-                    cont.resumeWithException(e)
-                }
+                    .addOnFailureListener { e ->
+                        cont.resumeWithException(e)
+                    }
+            } catch (se: SecurityException) {
+                cont.resumeWithException(se)
+            }
         }
 
     private suspend fun getLastKnownLocation(): Location? =
@@ -125,9 +130,21 @@ class LocationHelper(private val context: Context) {
                 cont.resume(null)
                 return@suspendCancellableCoroutine
             }
-            fusedClient.lastLocation
-                .addOnSuccessListener { location -> cont.resume(location) }
-                .addOnFailureListener { cont.resume(null) }
+            try {
+                getLastLocationTask()
+                    .addOnSuccessListener { location -> cont.resume(location) }
+                    .addOnFailureListener { cont.resume(null) }
+            } catch (_: SecurityException) {
+                cont.resume(null)
+            }
         }
-}
 
+    // These wrappers are called only after permission checks in the suspend functions above.
+    @SuppressLint("MissingPermission")
+    private fun getCurrentLocationTask(request: CurrentLocationRequest): Task<Location> =
+        fusedClient.getCurrentLocation(request, null)
+
+    @SuppressLint("MissingPermission")
+    private fun getLastLocationTask(): Task<Location> =
+        fusedClient.lastLocation
+}
