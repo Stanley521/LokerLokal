@@ -1,0 +1,42 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="400"
+    android:viewportHeight="280">
+    <!-- Sky gradient background -->
+    <path
+        android:fillColor="#87CEEB"
+        android:pathData="M 0,0 L 400,0 L 400,280 L 0,280 Z" />
+
+    <!-- Cafe building -->
+    <path
+        android:fillColor="#D2691E"
+        android:pathData="M 80,100 L 320,100 L 320,200 L 80,200 Z" />
+
+    <!-- Door -->
+    <path
+        android:fillColor="#654321"
+        android:pathData="M 170,140 L 230,140 L 230,200 L 170,200 Z" />
+
+    <!-- Window 1 -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M 110,120 L 160,120 L 160,160 L 110,160 Z" />
+
+    <!-- Window 2 -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M 240,120 L 290,120 L 290,160 L 240,160 Z" />
+
+    <!-- Roof -->
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M 80,100 L 200,40 L 320,100 Z" />
+
+    <!-- Ground -->
+    <path
+        android:fillColor="#90EE90"
+        android:pathData="M 0,200 L 400,200 L 400,280 L 0,280 Z" />
+</vector>
+
+

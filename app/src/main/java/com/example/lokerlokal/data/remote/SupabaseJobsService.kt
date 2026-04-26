@@ -13,7 +13,15 @@ import java.net.URL
 data class NearbyJob(
     val id: Long,
     val title: String,
-    val company: String,
+    val businessName: String,
+    val description: String,
+    val jobType: String,
+    val payText: String,
+    val addressText: String,
+    val whatsapp: String,
+    val phone: String,
+    val expiresAt: String,
+    val createdAt: String,
     val latitude: Double,
     val longitude: Double,
 )
@@ -87,7 +95,15 @@ object SupabaseJobsService {
                         ?: NearbyJob(
                             id = index.toLong(),
                             title = "Unknown",
-                            company = "Unknown",
+                            businessName = "Unknown",
+                            description = "",
+                            jobType = "",
+                            payText = "",
+                            addressText = "",
+                            whatsapp = "",
+                            phone = "",
+                            expiresAt = "",
+                            createdAt = "",
                             latitude = lat,
                             longitude = lng,
                         )
@@ -120,7 +136,17 @@ object SupabaseJobsService {
         return NearbyJob(
             id = optLongAny("id", "job_id") ?: index.toLong(),
             title = optStringAny("title", "job_title", "position", "nama_pekerjaan") ?: "Untitled Job",
-            company = optStringAny("company", "company_name", "nama_perusahaan") ?: "Unknown Company",
+            businessName =
+                optStringAny("business_name", "company", "company_name", "nama_perusahaan")
+                    ?: "Unknown Business",
+            description = optStringAny("description", "job_description", "deskripsi") ?: "",
+            jobType = optStringAny("job_type", "type", "tipe_pekerjaan") ?: "",
+            payText = optStringAny("pay_text", "salary_text", "gaji_text") ?: "",
+            addressText = optStringAny("address_text", "address", "alamat") ?: "",
+            whatsapp = optStringAny("whatsapp", "whatsapp_number") ?: "",
+            phone = optStringAny("phone", "phone_number") ?: "",
+            expiresAt = optStringAny("expires_at", "expired_at") ?: "",
+            createdAt = optStringAny("created_at") ?: "",
             latitude = parsedLat ?: 0.0,
             longitude = parsedLng ?: 0.0,
         )

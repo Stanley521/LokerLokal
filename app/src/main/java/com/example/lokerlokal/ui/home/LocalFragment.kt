@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lokerlokal.databinding.FragmentHomeBinding
 import com.example.lokerlokal.ui.map.MapJobsSharedViewModel
 
-class HomeFragment : Fragment() {
+class LocalFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private lateinit var jobsAdapter: LocalJobsListAdapter
@@ -18,8 +18,6 @@ class HomeFragment : Fragment() {
         ownerProducer = { requireParentFragment().requireParentFragment() }
     )
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -47,3 +45,4 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 }
+

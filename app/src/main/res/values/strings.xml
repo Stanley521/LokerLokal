@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">LokerLokal</string>
-    <string name="title_home">Home</string>
+    <string name="title_home">Lokal</string>
+    <string name="title_local">Lokal</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_map">Map</string>
     <string name="title_notifications">Notifications</string>
+    <string name="local_jobs_title">Loker Lokal</string>
+    <string name="local_jobs_empty">Belum ada loker lokal tersedia.</string>
+    <string name="local_job_image">Gambar loker</string>
     <string name="map_job_company_coordinates">%1$s (%2$.6f, %3$.6f)</string>
 </resources>
