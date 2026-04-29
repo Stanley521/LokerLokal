@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Legacy (kept for compatibility) -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +8,34 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- LokerLokal Brand Colors -->
+    <color name="primary_main">#00CED1</color>
+    <color name="primary_dark">#00A3A6</color>
+    <color name="primary_light">#E6FAFA</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#475569</color>
+
+    <!-- Background & Surface -->
+    <color name="background">#F8FAFC</color>
+    <color name="divider">#CBD5E1</color>
+
+    <!-- Accent Colors -->
+    <color name="warm_accent">#FF9F1C</color>
+    <color name="soft_accent">#FFE8CC</color>
+
+    <!-- Status Colors -->
+    <color name="success">#22C55E</color>
+    <color name="warning">#F59E0B</color>
+    <color name="error">#EF4444</color>
+    <color name="info">#38BDF8</color>
+
+    <!-- Gradient Start/End (for reference) -->
+    <color name="gradient_primary_start">#00CED1</color>
+    <color name="gradient_primary_end">#38BDF8</color>
+    <color name="gradient_light_start">#E6FAFA</color>
+    <color name="gradient_light_end">#F8FAFC</color>
 </resources>
+

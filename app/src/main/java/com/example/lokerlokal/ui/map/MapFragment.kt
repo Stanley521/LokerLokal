@@ -32,6 +32,11 @@ import kotlin.math.roundToInt
 
 class MapFragment : Fragment(R.layout.fragment_map) {
 
+    companion object {
+        private const val DEFAULT_MAP_ZOOM = 14.5f
+        private const val CURRENT_LOCATION_ZOOM = 15f
+    }
+
     private data class Region(
         val latitude: Double,
         val longitude: Double,
@@ -133,6 +138,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         mapFragment.getMapAsync { map ->
             googleMap = map
             updateMyLocationLayer()
+            map.uiSettings.isZoomControlsEnabled = true
+            map.uiSettings.isZoomGesturesEnabled = true
             map.setOnMarkerClickListener { marker ->
                 val markerJobId = marker.tag as? Long
                 val tappedJob = jobs.firstOrNull { it.id == markerJobId }
@@ -143,7 +150,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             map.moveCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     LatLng(region.latitude, region.longitude),
-                    11f,
+                    DEFAULT_MAP_ZOOM,
                 )
             )
 
@@ -174,6 +181,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                                     createdAt = it.createdAt,
                                     latitude = it.latitude,
                                     longitude = it.longitude,
+                                    businessPlaceId = it.businessPlaceId,
                                 )
                             }
                         )
@@ -208,7 +216,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 )
 
                 googleMap?.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(LatLng(coords.latitude, coords.longitude), 13f)
+                    CameraUpdateFactory.newLatLngZoom(LatLng(coords.latitude, coords.longitude), CURRENT_LOCATION_ZOOM)
                 )
 
                 fetchJobs(coords.latitude, coords.longitude)
@@ -240,6 +248,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     createdAt = it.createdAt,
                     latitude = it.latitude,
                     longitude = it.longitude,
+                    businessPlaceId = it.businessPlaceId,
                 )
             }
             jobs = fetched
@@ -321,7 +330,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
 
         jobs.firstOrNull()?.let { first ->
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(first.latitude, first.longitude), 12f))
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(first.latitude, first.longitude), CURRENT_LOCATION_ZOOM))
         }
     }
 

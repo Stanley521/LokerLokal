@@ -24,6 +24,7 @@ data class NearbyJob(
     val createdAt: String,
     val latitude: Double,
     val longitude: Double,
+    val businessPlaceId: String,
 )
 
 object SupabaseJobsService {
@@ -91,8 +92,14 @@ object SupabaseJobsService {
                 val jsonArray = JSONArray(body)
                 logDebug("Parsed ${jsonArray.length()} jobs from Supabase")
                 return@withContext List(jsonArray.length()) { index ->
-                    jsonArray.optJSONObject(index)?.toNearbyJob(index)
-                        ?: NearbyJob(
+                    val rawEntry = jsonArray.opt(index)
+                    val rowObject = rawEntry as? JSONObject
+                    if (rowObject == null) {
+                        logDebug(
+                            "Row[$index] is not a JSON object. type=${rawEntry?.javaClass?.simpleName ?: "null"} value=${rawEntry?.toString()?.take(220)}"
+                        )
+                        logDebug("Row[$index] fallback job generated (id=$index, businessPlaceId='')")
+                        NearbyJob(
                             id = index.toLong(),
                             title = "Unknown",
                             businessName = "Unknown",
@@ -106,7 +113,11 @@ object SupabaseJobsService {
                             createdAt = "",
                             latitude = lat,
                             longitude = lng,
+                            businessPlaceId = "",
                         )
+                    } else {
+                        rowObject.toNearbyJob(index)
+                    }
                 }
             } finally {
                 connection.disconnect()
@@ -132,13 +143,33 @@ object SupabaseJobsService {
     private fun JSONObject.toNearbyJob(index: Int): NearbyJob {
         val parsedLat = optDoubleAny("latitude", "lat", "job_latitude")
         val parsedLng = optDoubleAny("longitude", "lng", "job_longitude")
+        val parsedId = optLongAny("id", "job_id") ?: index.toLong()
+        val parsedTitle = optStringAny("title", "job_title", "position", "nama_pekerjaan") ?: "Untitled Job"
+        val parsedBusinessName =
+            optStringAny("business_name", "company", "company_name", "nama_perusahaan") ?: "Unknown Business"
+        val parsedBusinessPlaceId =
+            optStringAny(
+                "business_place_id",
+                "businessPlaceId",
+                "business_placeid",
+                "place_id",
+                "placeId",
+                "google_place_id",
+                "googlePlaceId",
+            ) ?: ""
+
+        if (parsedBusinessPlaceId.isBlank()) {
+            logDebug("Row[$index] businessPlaceId missing. availableKeys=${keysPreview()}")
+        }
+
+        logDebug(
+            "Row[$index] parsed id=$parsedId title='${parsedTitle.take(40)}' business='${parsedBusinessName.take(40)}' businessPlaceId='${parsedBusinessPlaceId.ifBlank { "<empty>" }}'"
+        )
 
         return NearbyJob(
-            id = optLongAny("id", "job_id") ?: index.toLong(),
-            title = optStringAny("title", "job_title", "position", "nama_pekerjaan") ?: "Untitled Job",
-            businessName =
-                optStringAny("business_name", "company", "company_name", "nama_perusahaan")
-                    ?: "Unknown Business",
+            id = parsedId,
+            title = parsedTitle,
+            businessName = parsedBusinessName,
             description = optStringAny("description", "job_description", "deskripsi") ?: "",
             jobType = optStringAny("job_type", "type", "tipe_pekerjaan") ?: "",
             payText = optStringAny("pay_text", "salary_text", "gaji_text") ?: "",
@@ -149,6 +180,7 @@ object SupabaseJobsService {
             createdAt = optStringAny("created_at") ?: "",
             latitude = parsedLat ?: 0.0,
             longitude = parsedLng ?: 0.0,
+            businessPlaceId = parsedBusinessPlaceId,
         )
     }
 
@@ -184,6 +216,15 @@ object SupabaseJobsService {
             }
         }
         return null
+    }
+
+    private fun JSONObject.keysPreview(): String {
+        val keys = mutableListOf<String>()
+        val iterator = keys()
+        while (iterator.hasNext()) {
+            keys += iterator.next()
+        }
+        return keys.sorted().joinToString(prefix = "[", postfix = "]")
     }
 }
 

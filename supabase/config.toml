@@ -1,0 +1,6 @@
+project_id = "speangcuanghkgyfippo"
+
+[functions.google-place-details]
+verify_jwt = false
+
+

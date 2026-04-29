@@ -3,6 +3,24 @@ import java.util.Properties
 fun asBuildConfigString(value: String): String =
     "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
+fun isGooglePlaceJwtDisabled(rootDir: File): Boolean {
+    val configFile = rootDir.resolve("supabase/config.toml")
+    if (!configFile.exists()) return false
+
+    var inGooglePlaceSection = false
+    for (line in configFile.readLines()) {
+        val trimmed = line.trim()
+        when {
+            trimmed.startsWith("[") -> inGooglePlaceSection = trimmed == "[functions.google-place-details]"
+            inGooglePlaceSection && trimmed.startsWith("verify_jwt") -> {
+                val value = trimmed.substringAfter("=", "").trim()
+                return value.equals("false", ignoreCase = true)
+            }
+        }
+    }
+    return false
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -76,7 +94,20 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
+
+tasks.matching { it.name == "preBuild" }.configureEach {
+    doFirst {
+        if (isGooglePlaceJwtDisabled(rootProject.projectDir)) {
+            logger.warn(
+                "⚠️  google-place-details Edge Function has verify_jwt=false in supabase/config.toml. " +
+                    "This is okay for current testing, but remember to re-enable JWT verification before shipping a production build."
+            )
+        }
+    }
+}
+

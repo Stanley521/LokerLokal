@@ -19,6 +19,7 @@ data class MapJobItem(
     val createdAt: String,
     val latitude: Double,
     val longitude: Double,
+    val businessPlaceId: String,
 )
 
 class MapJobsSharedViewModel : ViewModel() {
