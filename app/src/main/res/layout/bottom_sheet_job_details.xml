@@ -9,11 +9,11 @@
     android:orientation="vertical"
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
-    android:paddingBottom="64dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <!-- Drag Handle Header -->
     <LinearLayout
+        android:id="@+id/drag_handle_header"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@android:color/transparent"
@@ -30,6 +30,7 @@
 
     <!-- Divider -->
     <View
+        android:id="@+id/drag_handle_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/divider" />

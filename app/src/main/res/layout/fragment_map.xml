@@ -4,22 +4,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh_layout"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map_fragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" />
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/map_fragment"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+    <LinearLayout
+        android:id="@+id/map_controls_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical">
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        <ImageButton
+            android:id="@+id/button_current_location"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_map_control_button"
+            android:contentDescription="@string/title_map"
+            android:padding="12dp"
+            android:src="@drawable/ic_near_me_24"
+            app:tint="@color/primary_dark" />
+
+        <ImageButton
+            android:id="@+id/button_zoom_in"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_map_control_button"
+            android:contentDescription="Zoom in"
+            android:padding="12dp"
+            android:src="@drawable/ic_add_24"
+            app:tint="@color/primary_dark" />
+
+        <ImageButton
+            android:id="@+id/button_zoom_out"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_map_control_button"
+            android:contentDescription="Zoom out"
+            android:padding="12dp"
+            android:src="@drawable/ic_remove_24"
+            app:tint="@color/primary_dark" />
+
+    </LinearLayout>
 
     <include
         android:id="@+id/bottom_sheet"
         layout="@layout/bottom_sheet_job_details" />
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/map_nav_view"
