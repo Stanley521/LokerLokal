@@ -9,4 +9,22 @@
     <string name="local_jobs_empty">Belum ada loker lokal tersedia.</string>
     <string name="local_job_image">Gambar loker</string>
     <string name="map_job_company_coordinates">%1$s (%2$.6f, %3$.6f)</string>
+    <string name="upload_resume_pdf">Upload Resume PDF (max 500KB)</string>
+    <string name="chat_via_whatsapp">Chat via WhatsApp</string>
+    <string name="unknown_business">Bisnis tidak diketahui</string>
+    <string name="unknown_job_title">Judul lowongan tidak diketahui</string>
+    <string name="job_detail_summary">Gaji: %1$s\nAlamat: %2$s\nBatas Akhir: %3$s</string>
+    <string name="no_resume_uploaded">Belum ada resume terunggah. Upload resume Anda untuk apply cepat.</string>
+    <string name="resume_status_template">Resume: %1$s (%2$s)\nTerakhir diperbarui: %3$s</string>
+    <string name="resume_uploaded_success">Resume berhasil diunggah.</string>
+    <string name="resume_upload_failed">Gagal mengunggah resume.</string>
+    <string name="invalid_pdf_file">File PDF tidak valid.</string>
+    <string name="pdf_too_large">Ukuran PDF maksimal 500KB.</string>
+    <string name="upload_resume_first">Upload resume terlebih dahulu.</string>
+    <string name="whatsapp_not_installed">WhatsApp belum terpasang. Silakan install WhatsApp terlebih dahulu.</string>
+    <string name="whatsapp_application_message">Halo %1$s,\nPerkenalkan saya pelamar untuk posisi %2$s.\nSaya tertarik melamar untuk lokasi %3$s.\nResume saya terlampir, terima kasih.</string>
+    <string name="no_selected_job">Pilih lowongan terlebih dahulu.</string>
+    <string name="close_job_apply_sheet">Tutup panel apply lowongan</string>
+    <string name="map_zoom_in">Zoom in</string>
+    <string name="map_zoom_out">Zoom out</string>
 </resources>

@@ -27,8 +27,19 @@ class MapJobsSharedViewModel : ViewModel() {
     private val _jobs = MutableLiveData<List<MapJobItem>>(emptyList())
     val jobs: LiveData<List<MapJobItem>> = _jobs
 
+    private val _selectedJob = MutableLiveData<MapJobItem?>(null)
+    val selectedJob: LiveData<MapJobItem?> = _selectedJob
+
     fun setJobs(jobs: List<MapJobItem>) {
         _jobs.value = jobs
+    }
+
+    fun selectJob(job: MapJobItem) {
+        _selectedJob.value = job
+    }
+
+    fun clearSelectedJob() {
+        _selectedJob.value = null
     }
 }
 

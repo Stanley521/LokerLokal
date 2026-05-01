@@ -8,6 +8,7 @@ import android.os.Looper
 import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -82,17 +83,26 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private var googleMap: GoogleMap? = null
     private var sheetBehavior: BottomSheetBehavior<View>? = null
+    private var applySheetBehavior: BottomSheetBehavior<View>? = null
+    private var applySheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
     private var sheetNavController: NavController? = null
     private var mapNavView: BottomNavigationView? = null
     private var mapControlsContainer: View? = null
+    private var allowApplySheetHide = false
+
+    private val backPressCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            hideApplySheet()
+        }
+    }
 
     private val sheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
-            updateMapControlsPosition(bottomSheet.top)
+            updateMapControlsPosition()
         }
 
         override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            updateMapControlsPosition(bottomSheet.top)
+            updateMapControlsPosition()
         }
     }
 
@@ -101,12 +111,15 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
         mapControlsContainer = view.findViewById(R.id.map_controls_container)
         view.findViewById<ImageButton>(R.id.button_current_location).setOnClickListener {
+            onMapInteractionCollapseApplySheet()
             initLocation()
         }
         view.findViewById<ImageButton>(R.id.button_zoom_in).setOnClickListener {
+            onMapInteractionCollapseApplySheet()
             googleMap?.animateCamera(CameraUpdateFactory.zoomIn())
         }
         view.findViewById<ImageButton>(R.id.button_zoom_out).setOnClickListener {
+            onMapInteractionCollapseApplySheet()
             googleMap?.animateCamera(CameraUpdateFactory.zoomOut())
         }
 
@@ -121,7 +134,15 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 systemBarsInsets.bottom,
             )
             sheetBehavior?.expandedOffset = systemBarsInsets.top + expandedTopMargin()
-            updateMapControlsPosition(view.findViewById<View>(R.id.bottom_sheet).top)
+            val applySheetView = view.findViewById<View>(R.id.apply_sheet)
+            applySheetView.setPadding(
+                applySheetView.paddingLeft,
+                applySheetView.paddingTop,
+                applySheetView.paddingRight,
+                systemBarsInsets.bottom,
+            )
+            applySheetBehavior?.expandedOffset = systemBarsInsets.top + expandedTopMargin()
+            updateMapControlsPosition()
             insets
         }
 
@@ -143,6 +164,63 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             sheetBehavior?.expandedOffset = currentInsets.top + expandedTopMargin()
         }
 
+        // Wire up the apply (second) bottom sheet
+        val applySheetView = view.findViewById<View>(R.id.apply_sheet)
+        applySheetView.bringToFront()
+        applySheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        if (allowApplySheetHide) {
+                            allowApplySheetHide = false
+                            backPressCallback.isEnabled = false
+                            sharedJobsViewModel.clearSelectedJob()
+                        } else if (selectedJobOrNull() != null) {
+                            bottomSheet.post {
+                                applySheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+                            }
+                        }
+                    }
+
+                    BottomSheetBehavior.STATE_COLLAPSED,
+                    BottomSheetBehavior.STATE_HALF_EXPANDED,
+                    BottomSheetBehavior.STATE_EXPANDED,
+                    BottomSheetBehavior.STATE_SETTLING,
+                    BottomSheetBehavior.STATE_DRAGGING -> {
+                        applySheetBehavior?.isHideable = false
+                        backPressCallback.isEnabled = true
+                    }
+                }
+                updateMapControlsPosition()
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                updateMapControlsPosition()
+            }
+        }
+        applySheetBehavior = BottomSheetBehavior.from(applySheetView).also { behavior ->
+            behavior.isFitToContents = false
+            behavior.expandedOffset = 0
+            behavior.halfExpandedRatio = 0.6f
+            behavior.skipCollapsed = false
+            behavior.isHideable = true
+            behavior.peekHeight = applyPeekHeight()
+            behavior.state = BottomSheetBehavior.STATE_HIDDEN
+            behavior.addBottomSheetCallback(applySheetCallback!!)
+        }
+        if (currentInsets != null) {
+            applySheetBehavior?.expandedOffset = currentInsets.top + expandedTopMargin()
+            applySheetView.setPadding(
+                applySheetView.paddingLeft,
+                applySheetView.paddingTop,
+                applySheetView.paddingRight,
+                currentInsets.bottom,
+            )
+        }
+
+        // Register back press: enabled only when apply sheet is visible
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressCallback)
+
         val sheetNavHost =
             childFragmentManager.findFragmentById(R.id.sheet_nav_host_fragment) as NavHostFragment
         sheetNavController = sheetNavHost.navController
@@ -155,7 +233,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
         sheetView.post {
             applySheetStateForDestination(sheetNavController?.currentDestination?.id ?: R.id.navigation_local)
-            updateMapControlsPosition(sheetView.top)
+            updateMapControlsPosition()
         }
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -164,6 +242,14 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             updateMyLocationLayer()
             map.uiSettings.isZoomControlsEnabled = false
             map.uiSettings.isZoomGesturesEnabled = true
+            map.setOnCameraMoveStartedListener { reason ->
+                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                    onMapInteractionCollapseApplySheet()
+                }
+            }
+            map.setOnMapClickListener {
+                onMapInteractionCollapseApplySheet()
+            }
             map.setOnMarkerClickListener { marker ->
                 val markerJobId = marker.tag as? Long
                 val tappedJob = jobs.firstOrNull { it.id == markerJobId }
@@ -304,9 +390,77 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private fun handleMarkerPress(@Suppress("UNUSED_PARAMETER") job: MapJobItem) {
+    private fun handleMarkerPress(job: MapJobItem) {
+        sharedJobsViewModel.selectJob(job)
+        if (childFragmentManager.findFragmentByTag(JobApplyBottomSheetFragment.TAG) == null) {
+            childFragmentManager.beginTransaction()
+                .replace(R.id.apply_sheet_container, JobApplyBottomSheetFragment(), JobApplyBottomSheetFragment.TAG)
+                .commit()
+        }
+        allowApplySheetHide = false
+        applySheetBehavior?.peekHeight = applyPeekHeight()
+        applySheetBehavior?.isHideable = false
+        applySheetBehavior?.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        backPressCallback.isEnabled = true
         view?.post { openSheet() }
     }
+
+    fun hideApplySheet() {
+        val behavior = applySheetBehavior ?: return
+        if (behavior.state == BottomSheetBehavior.STATE_HIDDEN) return
+        allowApplySheetHide = true
+        behavior.isHideable = true
+        behavior.state = BottomSheetBehavior.STATE_HIDDEN
+    }
+
+    private fun onMapInteractionCollapseApplySheet() {
+        collapseApplySheetToPeek(showHint = true)
+    }
+
+    private fun collapseApplySheetToPeek(showHint: Boolean = false) {
+        val behavior = applySheetBehavior ?: return
+        if (behavior.state == BottomSheetBehavior.STATE_HIDDEN) return
+        if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) return
+        if (showHint) showApplySheetAutoCollapseHint()
+        allowApplySheetHide = false
+        behavior.isHideable = false
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    private fun showApplySheetAutoCollapseHint() {
+        val applyFragment = childFragmentManager.findFragmentByTag(JobApplyBottomSheetFragment.TAG) ?: return
+        val handle = applyFragment.view?.findViewById<View>(R.id.apply_drag_handle) ?: return
+        handle.animate().cancel()
+        handle.animate()
+            .scaleX(1.18f)
+            .scaleY(1.18f)
+            .alpha(0.7f)
+            .setDuration(90L)
+            .withEndAction {
+                handle.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .alpha(1f)
+                    .setDuration(120L)
+                    .start()
+            }
+            .start()
+    }
+
+    internal fun selectJobForTest(job: MapJobItem) {
+        handleMarkerPress(job)
+    }
+
+    internal fun simulateMapInteractionForTest() {
+        onMapInteractionCollapseApplySheet()
+    }
+
+    internal fun expandApplySheetForTest() {
+        applySheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    internal fun applySheetStateForTest(): Int =
+        applySheetBehavior?.state ?: BottomSheetBehavior.STATE_HIDDEN
 
     // ===================== MARKER RENDERING =====================
 
@@ -368,6 +522,10 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun homePeekHeight(): Int = (220f * resources.displayMetrics.density).roundToInt()
 
+    private fun applyPeekHeight(): Int = homePeekHeight()
+
+    private fun selectedJobOrNull(): MapJobItem? = sharedJobsViewModel.selectedJob.value
+
     private fun formatDistance(fromLat: Double, fromLng: Double, toLat: Double, toLng: Double): String {
         val meters = FloatArray(1)
         Location.distanceBetween(fromLat, fromLng, toLat, toLng, meters)
@@ -381,7 +539,21 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun expandedTopMargin(): Int = (16f * resources.displayMetrics.density).roundToInt()
 
-    private fun updateMapControlsPosition(sheetTop: Int) {
+    private fun updateMapControlsPosition() {
+        val rootView = view ?: return
+        val applyView = rootView.findViewById<View>(R.id.apply_sheet)
+        val applyBehavior = applySheetBehavior
+        if (applyBehavior != null && applyBehavior.state != BottomSheetBehavior.STATE_HIDDEN) {
+            updateMapControlsPosition(applyView.top, applyBehavior)
+            return
+        }
+
+        val mainSheetView = rootView.findViewById<View>(R.id.bottom_sheet)
+        val mainBehavior = sheetBehavior ?: return
+        updateMapControlsPosition(mainSheetView.top, mainBehavior)
+    }
+
+    private fun updateMapControlsPosition(sheetTop: Int, behavior: BottomSheetBehavior<View>) {
         val rootView = view ?: return
         val controls = mapControlsContainer ?: return
         val navView = mapNavView ?: return
@@ -389,7 +561,6 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             val controlsHeight = controls.height
             if (controlsHeight == 0) return@post
 
-            val behavior = sheetBehavior ?: return@post
             val margin = (16f * resources.displayMetrics.density).roundToInt()
             val rootHeight = rootView.height
             if (rootHeight == 0) return@post
@@ -424,6 +595,13 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         sheetBehavior?.removeBottomSheetCallback(sheetCallback)
         sheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
         sheetBehavior = null
+        applySheetCallback?.let { callback ->
+            applySheetBehavior?.removeBottomSheetCallback(callback)
+        }
+        applySheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        applySheetBehavior = null
+        applySheetCallback = null
+        allowApplySheetHide = false
         sheetNavController = null
         mapNavView = null
         mapControlsContainer = null

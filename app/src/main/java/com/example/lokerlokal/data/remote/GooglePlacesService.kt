@@ -16,6 +16,7 @@ data class BusinessPlaceDetails(
     val displayName: String,
     val formattedAddress: String,
     val photoUrl: String?,
+    val photoUrls: List<String>,
 )
 
 object GooglePlacesService {
@@ -61,18 +62,31 @@ object GooglePlacesService {
             val resolvedPlaceId = json.optString("placeId").ifBlank { placeId }
             val displayName = json.optString("displayName").orEmpty()
             val formattedAddress = json.optString("formattedAddress").orEmpty()
-            val photoName = json.optString("photoName").orEmpty()
-            val photoUrl = if (photoName.isNotBlank()) {
+            val photoNames = mutableListOf<String>()
+
+            val photoNamesArray = json.optJSONArray("photoNames")
+            if (photoNamesArray != null) {
+                for (index in 0 until photoNamesArray.length()) {
+                    val name = photoNamesArray.optString(index).trim()
+                    if (name.isNotEmpty()) photoNames += name
+                }
+            }
+
+            val firstPhotoName = json.optString("photoName").trim()
+            if (photoNames.isEmpty() && firstPhotoName.isNotEmpty()) {
+                photoNames += firstPhotoName
+            }
+
+            val photoUrls = photoNames.map { photoName ->
                 val encodedPhotoName = URLEncoder.encode(photoName, Charsets.UTF_8.name())
                 "$supabaseUrl/functions/v1/google-place-details?photoName=$encodedPhotoName"
-            } else {
-                null
             }
+            val photoUrl = photoUrls.firstOrNull()
 
             if (BuildConfig.DEBUG) {
                 Log.d(
                     PLACES_TAG,
-                    "Parsed proxy details placeId=$resolvedPlaceId displayName='${displayName.take(40)}' hasPhoto=${photoName.isNotBlank()} photoName='${photoName.take(80)}'"
+                    "Parsed proxy details placeId=$resolvedPlaceId displayName='${displayName.take(40)}' photoCount=${photoUrls.size}"
                 )
             }
 
@@ -81,6 +95,7 @@ object GooglePlacesService {
                 displayName = displayName,
                 formattedAddress = formattedAddress,
                 photoUrl = photoUrl,
+                photoUrls = photoUrls,
             )
         } finally {
             connection.disconnect()

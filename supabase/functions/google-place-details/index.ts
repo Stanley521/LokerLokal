@@ -12,6 +12,7 @@ type PlaceDetailsResponse = {
   displayName: string;
   formattedAddress: string;
   photoName: string | null;
+  photoNames: string[];
 };
 
 serve(async (req) => {
@@ -76,6 +77,11 @@ serve(async (req) => {
     displayName: json.displayName?.text || "",
     formattedAddress: json.formattedAddress || "",
     photoName: json.photos?.[0]?.name || null,
+    photoNames: Array.isArray(json.photos)
+      ? json.photos
+          .map((photo: { name?: string }) => String(photo?.name || "").trim())
+          .filter((name: string) => name.length > 0)
+      : [],
   };
 
   return jsonResponse(result, 200);

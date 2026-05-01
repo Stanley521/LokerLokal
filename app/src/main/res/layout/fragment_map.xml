@@ -35,7 +35,7 @@
             android:layout_height="48dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/bg_map_control_button"
-            android:contentDescription="Zoom in"
+            android:contentDescription="@string/map_zoom_in"
             android:padding="12dp"
             android:src="@drawable/ic_add_24"
             app:tint="@color/primary_dark" />
@@ -45,7 +45,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@drawable/bg_map_control_button"
-            android:contentDescription="Zoom out"
+            android:contentDescription="@string/map_zoom_out"
             android:padding="12dp"
             android:src="@drawable/ic_remove_24"
             app:tint="@color/primary_dark" />
@@ -56,7 +56,6 @@
         android:id="@+id/bottom_sheet"
         layout="@layout/bottom_sheet_job_details" />
 
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/map_nav_view"
         android:layout_width="match_parent"
@@ -64,6 +63,28 @@
         android:layout_gravity="bottom"
         android:background="?android:attr/windowBackground"
         app:menu="@menu/bottom_nav_menu" />
+
+    <!-- Second sheet: Job Apply — declared last so it draws on top of the nav bar, no backdrop -->
+    <LinearLayout
+        android:id="@+id/apply_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_bottom_sheet_top_rounded"
+        android:clickable="true"
+        android:elevation="24dp"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:translationZ="24dp"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="0dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/apply_sheet_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
