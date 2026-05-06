@@ -36,7 +36,7 @@
         android:background="@color/divider" />
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/sheet_nav_host_fragment"
+        android:id="@+id/place_sheet_nav_host_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -45,4 +45,5 @@
         app:navGraph="@navigation/map_sheet_navigation" />
 
 </LinearLayout>
+
 

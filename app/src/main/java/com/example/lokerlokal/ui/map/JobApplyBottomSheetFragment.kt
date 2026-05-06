@@ -118,7 +118,7 @@ class JobApplyBottomSheetFragment : Fragment() {
     }
 
     private fun loadBusinessPhotos(job: MapJobItem) {
-        val placeId = job.businessPlaceId.trim()
+        val placeId = job.placeId.trim()
         if (placeId.isBlank()) {
             photosAdapter.submitUrls(emptyList())
             return

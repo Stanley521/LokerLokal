@@ -1,197 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="300dp"
+    android:layout_width="320dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="4dp"
-    android:layout_marginEnd="12dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="@color/white">
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="64dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="6dp"
+    app:strokeColor="#0D0F172A"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- IMAGE + OVERLAY -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp">
+            android:layout_height="220dp">
 
             <ImageView
                 android:id="@+id/job_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@drawable/bg_primary_gradient"
                 android:contentDescription="@string/local_job_image"
-                android:scaleType="centerCrop"
-                android:background="@drawable/bg_primary_gradient" />
+                android:scaleType="centerCrop" />
 
-            <!-- Glass overlay -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="132dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/bg_local_job_header_scrim" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:orientation="vertical"
-                android:padding="12dp"
-                android:background="#CCFFFFFF">
+                android:padding="18dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
+                <TextView
                     android:id="@+id/job_business_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="@color/text_primary" />
-
-                    <TextView
-                        android:id="@+id/job_distance"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="12sp"
-                        app:drawableStartCompat="@drawable/ic_near_me_24"
-                        android:drawablePadding="6dp"
-                        app:drawableTint="@color/text_secondary"
-                        android:gravity="end|center_vertical"
-                        android:textColor="@color/text_secondary" />
-
-                </LinearLayout>
-
-                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:id="@+id/job_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
-                    <TextView
-                        android:id="@+id/job_type"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
-                </LinearLayout>
+                    android:layout_marginEnd="88dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textColor="@color/text_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/job_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="88dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/job_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="18dp"
+                android:background="@drawable/bg_local_job_distance_pill"
+                android:drawablePadding="6dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:minHeight="32dp"
+                android:paddingStart="10dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="6dp"
+                android:textColor="@color/text_primary"
+                android:textSize="12sp"
+                app:drawableStartCompat="@drawable/ic_near_me_24"
+                app:drawableTint="@color/text_secondary" />
+
         </FrameLayout>
 
-        <!-- INFO GRID: single column, one row per field -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:background="@drawable/bg_info_grid_rounded_top">
+            android:orientation="vertical">
 
-            <!-- Hidden: preserve job_business_name variable -->
-<!--            <TextView-->
-<!--                android:id="@+id/job_business_name"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:visibility="gone" />-->
-
-            <!-- Job Description -->
-            <TextView
-                android:id="@+id/job_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:minHeight="24dp"
-                app:drawableStartCompat="@drawable/ic_work_outline_24"
-                android:drawablePadding="8dp"
-                app:drawableTint="@color/primary_dark"
-                android:gravity="center_vertical"
-                android:textColor="@color/primary_dark"
-                android:textSize="13sp" />
-
-            <!-- Pay -->
-            <TextView
-                android:id="@+id/job_pay_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:minHeight="24dp"
-                app:drawableStartCompat="@drawable/ic_payments_24"
-                android:drawablePadding="8dp"
-                app:drawableTint="@color/primary_dark"
-                android:gravity="center_vertical"
-                android:textColor="@color/primary_dark"
-                android:textSize="13sp" />
-
-            <!-- Address -->
-            <TextView
-                android:id="@+id/job_address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:minHeight="24dp"
-                app:drawableStartCompat="@drawable/ic_location_on_24"
-                android:drawablePadding="8dp"
-                app:drawableTint="@color/primary_dark"
-                android:gravity="center_vertical"
-                android:textColor="@color/primary_dark"
-                android:textSize="13sp" />
-
-            <!-- WhatsApp -->
-            <TextView
-                android:id="@+id/job_whatsapp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:minHeight="24dp"
-                app:drawableStartCompat="@drawable/ic_chat_24"
-                android:drawablePadding="8dp"
-                app:drawableTint="@color/primary_dark"
-                android:gravity="center_vertical"
-                android:textColor="@color/primary_dark"
-                android:textSize="13sp" />
-
-            <!-- Phone -->
-            <TextView
-                android:id="@+id/job_phone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:minHeight="24dp"
-                app:drawableStartCompat="@drawable/ic_call_24"
-                android:drawablePadding="8dp"
-                app:drawableTint="@color/primary_dark"
-                android:gravity="center_vertical"
-                android:textColor="@color/primary_dark"
-                android:textSize="13sp" />
-
-            <!-- Expires: Bottom Right -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="end">
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/local_job_section_info"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/job_pay_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textColor="@color/success"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/job_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:drawablePadding="10dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="24dp"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    app:drawableStartCompat="@drawable/ic_schedule_24"
+                    app:drawableTint="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/job_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:drawablePadding="10dp"
+                    android:gravity="top"
+                    android:minHeight="24dp"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    app:drawableStartCompat="@drawable/ic_work_outline_24"
+                    app:drawableTint="@color/text_secondary" />
+
+            </LinearLayout>
+
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#120F172A" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/local_job_section_location"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+<!--                <TextView-->
+<!--                    android:id="@+id/job_address"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:drawablePadding="10dp"-->
+<!--                    android:gravity="top"-->
+<!--                    android:minHeight="24dp"-->
+<!--                    android:textColor="@color/text_secondary"-->
+<!--                    android:textSize="14sp"-->
+<!--                    app:drawableStartCompat="@drawable/ic_location_on_24"-->
+<!--                    app:drawableTint="@color/text_secondary" />-->
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_view_on_map"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:backgroundTint="@color/gradient_light_end"
+                    android:elevation="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:stateListAnimator="@null"
+                    android:text="@string/local_job_view_on_map"
+                    android:textAllCaps="false"
+                    android:textColor="@color/text_primary"
+                    app:cornerRadius="14dp"
+                    app:elevation="0dp"
+                    app:icon="@drawable/ic_location_on_24"
+                    app:iconGravity="textStart"
+                    app:iconTint="@color/text_primary"
+                    app:rippleColor="@color/primary_light"
+                    app:strokeColor="@color/divider"
+                    app:strokeWidth="1dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#120F172A" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/local_job_section_deadline"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/job_expires_at"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="24dp"
-                    app:drawableStartCompat="@drawable/ic_schedule_24"
-                    android:drawablePadding="6dp"
-                    app:drawableTint="@color/error"
+                    android:layout_marginTop="10dp"
+                    android:drawablePadding="10dp"
                     android:gravity="center_vertical"
-                    android:textColor="@color/error"
-                    android:textSize="11sp" />
+                    android:minHeight="24dp"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    app:drawableStartCompat="@drawable/ic_schedule_24"
+                    app:drawableTint="@color/text_secondary" />
+
+
             </LinearLayout>
 
         </LinearLayout>

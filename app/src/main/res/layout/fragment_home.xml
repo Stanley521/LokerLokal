@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
+    android:background="@color/background"
+    android:fillViewport="true"
     tools:context=".ui.home.LocalFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
     <TextView
         android:id="@+id/local_jobs_title"
@@ -14,8 +20,18 @@
         android:layout_marginBottom="12dp"
         android:text="@string/local_jobs_title"
         android:textColor="@android:color/black"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textStyle="bold" />
+
+    <ProgressBar
+        android:id="@+id/local_jobs_loading"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/empty_jobs_text"
@@ -30,11 +46,25 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/jobs_list_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:clipToPadding="false"
+        android:nestedScrollingEnabled="false"
+        android:paddingStart="4dp"
         android:paddingEnd="16dp"
         tools:itemCount="2"
         tools:listitem="@layout/item_local_job_card" />
 
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/load_more_loading"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="256dp"
+        android:visibility="gone" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
+

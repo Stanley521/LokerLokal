@@ -10,6 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ProgressBar
+        android:id="@+id/map_loading_indicator"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:elevation="12dp"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/map_controls_container"
         android:layout_width="wrap_content"
@@ -53,8 +62,8 @@
     </LinearLayout>
 
     <include
-        android:id="@+id/bottom_sheet"
-        layout="@layout/bottom_sheet_job_details" />
+        android:id="@+id/place_bottom_sheet"
+        layout="@layout/bottom_sheet_place_details" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/map_nav_view"

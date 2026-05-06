@@ -6,8 +6,13 @@
     <string name="title_map">Map</string>
     <string name="title_notifications">Notifications</string>
     <string name="local_jobs_title">Loker Lokal</string>
+    <string name="local_jobs_title_by_place">Loker di %1$s</string>
     <string name="local_jobs_empty">Belum ada loker lokal tersedia.</string>
     <string name="local_job_image">Gambar loker</string>
+    <string name="local_job_section_info">Info Loker</string>
+    <string name="local_job_section_location">Lokasi</string>
+    <string name="local_job_view_on_map">Lihat di Map</string>
+    <string name="local_job_section_deadline">Batas Akhir</string>
     <string name="map_job_company_coordinates">%1$s (%2$.6f, %3$.6f)</string>
     <string name="upload_resume_pdf">Upload Resume PDF (max 500KB)</string>
     <string name="chat_via_whatsapp">Chat via WhatsApp</string>
@@ -27,4 +32,12 @@
     <string name="close_job_apply_sheet">Tutup panel apply lowongan</string>
     <string name="map_zoom_in">Zoom in</string>
     <string name="map_zoom_out">Zoom out</string>
+    <!-- Dashboard -->
+    <string name="dashboard_title">Profil &amp; Resume</string>
+    <string name="dashboard_resume_section">Resume Saya</string>
+    <string name="dashboard_tips_title">Tips Melamar Kerja</string>
+    <string name="dashboard_tips_body">• Pastikan resume Anda selalu terbaru.\n• Sertakan pengalaman dan keahlian yang relevan.\n• Perhatikan batas waktu pendaftaran lowongan.\n• Hubungi perusahaan melalui WhatsApp dengan sopan dan profesional.</string>
+    <!-- Notifications -->
+    <string name="notifications_title">Lowongan Terbaru</string>
+    <string name="notifications_empty">Belum ada lowongan terbaru di sekitar Anda.</string>
 </resources>

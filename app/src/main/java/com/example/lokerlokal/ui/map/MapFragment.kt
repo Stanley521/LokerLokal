@@ -18,27 +18,38 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import android.util.Log
+import com.example.lokerlokal.BuildConfig
 import com.example.lokerlokal.R
+import com.example.lokerlokal.data.remote.NearbyJob
 import com.example.lokerlokal.data.remote.SupabaseJobsService
 import com.example.lokerlokal.util.LocationHelper
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import com.example.lokerlokal.ui.map.cache.CameraViewport
+import com.example.lokerlokal.ui.map.cache.InMemoryTileCacheManager
+import com.example.lokerlokal.ui.map.cache.TileBounds
 
 class MapFragment : Fragment(R.layout.fragment_map) {
 
     companion object {
+        private const val TAG = "MapFragment"
         private const val DEFAULT_MAP_ZOOM = 14.5f
         private const val CURRENT_LOCATION_ZOOM = 15f
+        const val LOCAL_JOBS_PAGE_SIZE = 5
     }
 
     private data class Region(
@@ -46,6 +57,17 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         val longitude: Double,
         val latitudeDelta: Double,
         val longitudeDelta: Double,
+    )
+
+    private enum class PlaceSheetMode {
+        NEARBY,
+        PLACE,
+    }
+
+    private data class SelectedPlaceContext(
+        val placeId: String,
+        val latitude: Double,
+        val longitude: Double,
     )
 
     private val locationHelper by lazy(LazyThreadSafetyMode.NONE) {
@@ -66,6 +88,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 updateMyLocationLayer()
                 setRefreshing(false)
                 Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
+                // Still fetch for default camera position so map isn't empty
+                lifecycleScope.launch {
+                    fetchJobsForCurrentViewport()
+                    fetchLocalJobsForMapCenter()
+                }
             }
         }
 
@@ -82,13 +109,25 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     private var jobs: List<MapJobItem> = emptyList()
 
     private var googleMap: GoogleMap? = null
-    private var sheetBehavior: BottomSheetBehavior<View>? = null
+    private var placeSheetBehavior: BottomSheetBehavior<View>? = null
     private var applySheetBehavior: BottomSheetBehavior<View>? = null
     private var applySheetCallback: BottomSheetBehavior.BottomSheetCallback? = null
     private var sheetNavController: NavController? = null
     private var mapNavView: BottomNavigationView? = null
     private var mapControlsContainer: View? = null
+    private var mapLoadingIndicator: View? = null
     private var allowApplySheetHide = false
+    private var cameraIdleFetchJob: Job? = null
+    private var lastCameraMoveWasGesture = false
+    private var placeSheetMode: PlaceSheetMode = PlaceSheetMode.NEARBY
+    private var selectedPlaceContext: SelectedPlaceContext? = null
+    private var forcePlaceSheetHalfExpanded = false
+
+    private val mapTileCache = InMemoryTileCacheManager<MapJobItem>(
+        ttlMs = 60_000L,
+        itemKey = { it.id },
+        remoteFetcher = { _, bounds -> fetchJobsForTile(bounds) },
+    )
 
     private val backPressCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -96,7 +135,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    private val sheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+    private val placeSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
             updateMapControlsPosition()
         }
@@ -110,6 +149,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         super.onViewCreated(view, savedInstanceState)
 
         mapControlsContainer = view.findViewById(R.id.map_controls_container)
+        mapLoadingIndicator = view.findViewById(R.id.map_loading_indicator)
+
+        sharedJobsViewModel.isMapLoading.observe(viewLifecycleOwner) { loading ->
+            mapLoadingIndicator?.visibility = if (loading) View.VISIBLE else View.GONE
+        }
         view.findViewById<ImageButton>(R.id.button_current_location).setOnClickListener {
             onMapInteractionCollapseApplySheet()
             initLocation()
@@ -133,7 +177,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 mapNavView.paddingRight,
                 systemBarsInsets.bottom,
             )
-            sheetBehavior?.expandedOffset = systemBarsInsets.top + expandedTopMargin()
+            placeSheetBehavior?.expandedOffset = systemBarsInsets.top + expandedTopMargin()
             val applySheetView = view.findViewById<View>(R.id.apply_sheet)
             applySheetView.setPadding(
                 applySheetView.paddingLeft,
@@ -147,8 +191,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
 
         // Wire up the activity-level bottom sheet
-        val sheetView = view.findViewById<View>(R.id.bottom_sheet)
-        sheetBehavior = BottomSheetBehavior.from(sheetView).also { behavior ->
+        val placeSheetView = view.findViewById<View>(R.id.place_bottom_sheet)
+        placeSheetBehavior = BottomSheetBehavior.from(placeSheetView).also { behavior ->
             behavior.isFitToContents = false
             behavior.expandedOffset = 0
             behavior.halfExpandedRatio = 0.6f
@@ -156,12 +200,12 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             behavior.isHideable = true
             behavior.peekHeight = homePeekHeight()
             behavior.state = BottomSheetBehavior.STATE_HIDDEN
-            behavior.addBottomSheetCallback(sheetCallback)
+            behavior.addBottomSheetCallback(placeSheetCallback)
         }
         val currentInsets = ViewCompat.getRootWindowInsets(view)
             ?.getInsets(WindowInsetsCompat.Type.systemBars())
         if (currentInsets != null) {
-            sheetBehavior?.expandedOffset = currentInsets.top + expandedTopMargin()
+            placeSheetBehavior?.expandedOffset = currentInsets.top + expandedTopMargin()
         }
 
         // Wire up the apply (second) bottom sheet
@@ -174,11 +218,10 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                         if (allowApplySheetHide) {
                             allowApplySheetHide = false
                             backPressCallback.isEnabled = false
-                            sharedJobsViewModel.clearSelectedJob()
-                        } else if (selectedJobOrNull() != null) {
-                            bottomSheet.post {
-                                applySheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
-                            }
+                        }
+
+                        if (selectedJobOrNull() == null) {
+                            backPressCallback.isEnabled = false
                         }
                     }
 
@@ -187,6 +230,14 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     BottomSheetBehavior.STATE_EXPANDED,
                     BottomSheetBehavior.STATE_SETTLING,
                     BottomSheetBehavior.STATE_DRAGGING -> {
+                        if (selectedJobOrNull() == null) {
+                            bottomSheet.post {
+                                applySheetBehavior?.isHideable = true
+                                applySheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+                            }
+                            backPressCallback.isEnabled = false
+                            return
+                        }
                         applySheetBehavior?.isHideable = false
                         backPressCallback.isEnabled = true
                     }
@@ -222,17 +273,17 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressCallback)
 
         val sheetNavHost =
-            childFragmentManager.findFragmentById(R.id.sheet_nav_host_fragment) as NavHostFragment
+            childFragmentManager.findFragmentById(R.id.place_sheet_nav_host_fragment) as NavHostFragment
         sheetNavController = sheetNavHost.navController
         mapNavView.setupWithNavController(sheetNavController!!)
         mapNavView.setOnItemReselectedListener { item ->
-            applySheetStateForDestination(item.itemId)
+            applyPlaceSheetStateForDestination(item.itemId)
         }
         sheetNavController?.addOnDestinationChangedListener { _, destination, _ ->
-            applySheetStateForDestination(destination.id)
+            applyPlaceSheetStateForDestination(destination.id)
         }
-        sheetView.post {
-            applySheetStateForDestination(sheetNavController?.currentDestination?.id ?: R.id.navigation_local)
+        placeSheetView.post {
+            applyPlaceSheetStateForDestination(sheetNavController?.currentDestination?.id ?: R.id.navigation_local)
             updateMapControlsPosition()
         }
 
@@ -243,17 +294,34 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             map.uiSettings.isZoomControlsEnabled = false
             map.uiSettings.isZoomGesturesEnabled = true
             map.setOnCameraMoveStartedListener { reason ->
+                lastCameraMoveWasGesture = reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
                 if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                     onMapInteractionCollapseApplySheet()
+                    collapsePlaceSheetToPeek()
                 }
             }
             map.setOnMapClickListener {
                 onMapInteractionCollapseApplySheet()
             }
+            map.setOnCameraIdleListener {
+                cameraIdleFetchJob?.cancel()
+                cameraIdleFetchJob = viewLifecycleOwner.lifecycleScope.launch {
+                    delay(300L)
+                    val shouldFetch = lastCameraMoveWasGesture
+                    logDebug("cameraIdle zoom=${map.cameraPosition.zoom} gesture=$shouldFetch")
+                    if (shouldFetch) {
+                        fetchJobsForCurrentViewport()
+                        fetchLocalJobsForMapCenter()
+                    } else {
+                        logDebug("cameraIdle skip all refetch because move was programmatic")
+                    }
+                    lastCameraMoveWasGesture = false
+                }
+            }
             map.setOnMarkerClickListener { marker ->
-                val markerJobId = marker.tag as? Long
-                val tappedJob = jobs.firstOrNull { it.id == markerJobId }
-                tappedJob?.let { handleMarkerPress(it) }
+                val markerPlaceId = marker.tag as? String
+                val tappedPlace = jobs.firstOrNull { it.id == markerPlaceId }
+                tappedPlace?.let { handlePlaceMarkerPress(it) }
                 true
             }
 
@@ -264,43 +332,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 )
             )
 
-            // Immediately try to fetch jobs from default region while waiting for location
-            lifecycleScope.launch {
-                try {
-                    val nearbyJobs = SupabaseJobsService.getNearbyJobs(region.latitude, region.longitude)
-                    if (nearbyJobs.isNotEmpty()) {
-                        onJobsChanged(
-                            nearbyJobs.map {
-                                MapJobItem(
-                                    id = it.id,
-                                    title = it.title,
-                                    businessName = it.businessName,
-                                    description = it.description,
-                                    jobType = it.jobType,
-                                    payText = it.payText,
-                                    distanceText = formatDistance(
-                                        region.latitude,
-                                        region.longitude,
-                                        it.latitude,
-                                        it.longitude,
-                                    ),
-                                    addressText = it.addressText,
-                                    whatsapp = it.whatsapp,
-                                    phone = it.phone,
-                                    expiresAt = it.expiresAt,
-                                    createdAt = it.createdAt,
-                                    latitude = it.latitude,
-                                    longitude = it.longitude,
-                                    businessPlaceId = it.businessPlaceId,
-                                )
-                            }
-                        )
-                    }
-                } catch (_: Exception) {
-                    // Silently skip initial fetch; user location will be more accurate
-                }
-            }
-            // Then init location to get user's actual position
+            // Fetch only after location resolves (acquired or denied) so first results are relevant
             initLocation()
         }
     }
@@ -325,11 +357,23 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     longitudeDelta = 0.01,
                 )
 
-                googleMap?.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(LatLng(coords.latitude, coords.longitude), CURRENT_LOCATION_ZOOM)
-                )
+                lastCameraMoveWasGesture = false
+                mapTileCache.clearAll()
 
-                fetchJobs(coords.latitude, coords.longitude)
+                val cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+                    LatLng(coords.latitude, coords.longitude), CURRENT_LOCATION_ZOOM
+                )
+                googleMap?.animateCamera(cameraUpdate, object : GoogleMap.CancelableCallback {
+                    override fun onFinish() {
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            fetchJobsForCurrentViewport()
+                            fetchLocalJobsForMapCenter()
+                        }
+                    }
+                    override fun onCancel() {
+                        // Camera animation cancelled (e.g. user panned); cameraIdle will handle refetch if gesture
+                    }
+                })
             } catch (error: Throwable) {
                 locationHelper.showLocationError(error) { initLocation() }
                 setRefreshing(false)
@@ -358,7 +402,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                     createdAt = it.createdAt,
                     latitude = it.latitude,
                     longitude = it.longitude,
-                    businessPlaceId = it.businessPlaceId,
+                    placeId = it.placeId,
                 )
             }
             jobs = fetched
@@ -382,31 +426,341 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
-    // ===================== UI FUNCTIONS =====================
+    private suspend fun fetchJobsForCurrentViewport() {
+        val map = googleMap ?: return
+        val bounds = map.projection.visibleRegion.latLngBounds
+        val viewport = bounds.toCameraViewport(map.cameraPosition.zoom)
+        setMapLoading(true)
+        try {
+            val diff = mapTileCache.diff(viewport)
+            logDebug(
+                "viewportFetch start zoom=${viewport.zoom} visibleTiles=${diff.visibleTiles.size} freshTiles=${diff.freshTiles.size} missTiles=${diff.staleOrMissingTiles.size}"
+            )
 
-    private fun openSheet() {
-        view?.post {
-            applySheetStateForDestination(sheetNavController?.currentDestination?.id ?: R.id.navigation_local)
+            val fresh = mapTileCache.getFreshVisibleItems(viewport)
+            if (fresh.isNotEmpty()) {
+                logDebug("viewportFetch cacheRender items=${fresh.size}")
+                onJobsChanged(fresh)
+            }
+
+            val fetched = runCatching { mapTileCache.fetchMissingTiles(viewport) }
+                .getOrElse {
+                    logDebug("viewportFetch networkError message=${it.message}")
+                    emptyList()
+                }
+            val merged = (fresh + fetched).distinctBy { it.id }
+            logDebug("viewportFetch fetched=${fetched.size} merged=${merged.size}")
+
+            if (merged.isNotEmpty()) {
+                onJobsChanged(merged)
+            }
+        } finally {
+            setMapLoading(false)
         }
     }
 
-    private fun handleMarkerPress(job: MapJobItem) {
+    private fun currentViewportNearbyRadius(): Int {
+        val map = googleMap ?: return 2_000
+        val bounds = map.projection.visibleRegion.latLngBounds
+        val center = map.cameraPosition.target
+
+        val edgeMidpoints = listOf(
+            LatLng(bounds.northeast.latitude, center.longitude),
+            LatLng(bounds.southwest.latitude, center.longitude),
+            LatLng(center.latitude, bounds.northeast.longitude),
+            LatLng(center.latitude, bounds.southwest.longitude),
+        )
+
+        val distances = edgeMidpoints.map { edge ->
+            val meters = FloatArray(1)
+            Location.distanceBetween(
+                center.latitude,
+                center.longitude,
+                edge.latitude,
+                edge.longitude,
+                meters,
+            )
+            meters.firstOrNull()?.toDouble() ?: Double.MAX_VALUE
+        }
+
+        val radiusMeters = distances.minOrNull()?.takeIf { it.isFinite() && it > 0.0 } ?: 2_000.0
+        val finalRadius = radiusMeters.roundToInt().coerceAtLeast(100)
+        logDebug("viewportNearbyRadius center=${center.latitude},${center.longitude} radius=$finalRadius bounds=(${bounds.southwest.latitude},${bounds.southwest.longitude})..(${bounds.northeast.latitude},${bounds.northeast.longitude})")
+        return finalRadius
+    }
+
+    private suspend fun fetchLocalJobsForMapCenter() {
+        val map = googleMap ?: return
+        val target = map.cameraPosition.target
+        val radius = currentViewportNearbyRadius()
+
+        placeSheetMode = PlaceSheetMode.NEARBY
+        selectedPlaceContext = null
+        sharedJobsViewModel.setLocalJobsSourceNearby()
+        sharedJobsViewModel.resetLocalJobsPagination()
+        sharedJobsViewModel.setLocalJobsLoading(true)
+        try {
+            val fetched = SupabaseJobsService.getNearbyJobs(
+                lat = target.latitude,
+                lng = target.longitude,
+                radius = radius,
+                limit = LOCAL_JOBS_PAGE_SIZE,
+                offset = 0,
+            ).map { it.toMapJobItem(target.latitude, target.longitude) }
+
+            sharedJobsViewModel.setLocalJobs(fetched)
+            sharedJobsViewModel.appendLocalJobs(fetched, LOCAL_JOBS_PAGE_SIZE)
+            // Re-apply so UI list stays at exactly 'fetched' (appendLocalJobs dedups, no double)
+        } catch (error: Throwable) {
+            logDebug("localJobsFetch error=${error.message}")
+            sharedJobsViewModel.setLocalJobs(emptyList())
+        } finally {
+            sharedJobsViewModel.setLocalJobsLoading(false)
+        }
+    }
+
+    private suspend fun fetchLocalJobsForPlace(placeMarker: MapJobItem) {
+        val placeId = placeMarker.placeId.trim()
+        if (placeId.isBlank()) {
+            sharedJobsViewModel.setLocalJobs(emptyList())
+            return
+        }
+
+        val map = googleMap
+        val target = map?.cameraPosition?.target
+        val originLat = target?.latitude ?: region.latitude
+        val originLng = target?.longitude ?: region.longitude
+
+        placeSheetMode = PlaceSheetMode.PLACE
+        selectedPlaceContext = SelectedPlaceContext(
+            placeId = placeId,
+            latitude = placeMarker.latitude,
+            longitude = placeMarker.longitude,
+        )
+        sharedJobsViewModel.setLocalJobsSourcePlace(placeMarker.businessName)
+        sharedJobsViewModel.resetLocalJobsPagination()
+        sharedJobsViewModel.setLocalJobsLoading(true)
+        try {
+            val fetched = SupabaseJobsService.getJobsByPlace(
+                placeId = placeId,
+                limit = LOCAL_JOBS_PAGE_SIZE,
+                offset = 0,
+            ).map { job ->
+                val resolvedLat = job.latitude.takeUnless { it == 0.0 } ?: placeMarker.latitude
+                val resolvedLng = job.longitude.takeUnless { it == 0.0 } ?: placeMarker.longitude
+                MapJobItem(
+                    id = job.id,
+                    title = job.title,
+                    businessName = job.businessName,
+                    description = job.description,
+                    jobType = job.jobType,
+                    payText = job.payText,
+                    distanceText = formatDistance(originLat, originLng, resolvedLat, resolvedLng),
+                    addressText = job.addressText,
+                    whatsapp = job.whatsapp,
+                    phone = job.phone,
+                    expiresAt = job.expiresAt,
+                    createdAt = job.createdAt,
+                    latitude = resolvedLat,
+                    longitude = resolvedLng,
+                    placeId = job.placeId.ifBlank { placeId },
+                )
+            }
+
+            sharedJobsViewModel.setLocalJobs(fetched)
+            sharedJobsViewModel.appendLocalJobs(fetched, LOCAL_JOBS_PAGE_SIZE)
+        } catch (error: Throwable) {
+            logDebug("localJobsByPlaceFetch error=${error.message} placeId=$placeId")
+            sharedJobsViewModel.setLocalJobs(emptyList())
+        } finally {
+            sharedJobsViewModel.setLocalJobsLoading(false)
+        }
+    }
+
+    fun loadMoreLocalJobs() {
+        if (!sharedJobsViewModel.hasMoreLocalJobs) return
+        if (sharedJobsViewModel.isLoadingMoreLocalJobs.value == true) return
+        val offset = sharedJobsViewModel.localJobsOffset
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            sharedJobsViewModel.setLoadingMoreLocalJobs(true)
+            try {
+                val fetched = when (placeSheetMode) {
+                    PlaceSheetMode.NEARBY -> {
+                        val map = googleMap ?: return@launch
+                        val target = map.cameraPosition.target
+                        val radius = currentViewportNearbyRadius()
+                        SupabaseJobsService.getNearbyJobs(
+                            lat = target.latitude,
+                            lng = target.longitude,
+                            radius = radius,
+                            limit = LOCAL_JOBS_PAGE_SIZE,
+                            offset = offset,
+                        ).map { it.toMapJobItem(target.latitude, target.longitude) }
+                    }
+
+                    PlaceSheetMode.PLACE -> {
+                        val placeContext = selectedPlaceContext ?: return@launch
+                        val map = googleMap
+                        val target = map?.cameraPosition?.target
+                        val originLat = target?.latitude ?: region.latitude
+                        val originLng = target?.longitude ?: region.longitude
+                        SupabaseJobsService.getJobsByPlace(
+                            placeId = placeContext.placeId,
+                            limit = LOCAL_JOBS_PAGE_SIZE,
+                            offset = offset,
+                        ).map { job ->
+                            val resolvedLat = job.latitude.takeUnless { it == 0.0 } ?: placeContext.latitude
+                            val resolvedLng = job.longitude.takeUnless { it == 0.0 } ?: placeContext.longitude
+                            MapJobItem(
+                                id = job.id,
+                                title = job.title,
+                                businessName = job.businessName,
+                                description = job.description,
+                                jobType = job.jobType,
+                                payText = job.payText,
+                                distanceText = formatDistance(originLat, originLng, resolvedLat, resolvedLng),
+                                addressText = job.addressText,
+                                whatsapp = job.whatsapp,
+                                phone = job.phone,
+                                expiresAt = job.expiresAt,
+                                createdAt = job.createdAt,
+                                latitude = resolvedLat,
+                                longitude = resolvedLng,
+                                placeId = job.placeId.ifBlank { placeContext.placeId },
+                            )
+                        }
+                    }
+                }
+
+                sharedJobsViewModel.appendLocalJobs(fetched, LOCAL_JOBS_PAGE_SIZE)
+            } catch (error: Throwable) {
+                logDebug("loadMoreLocalJobs error=${error.message}")
+            } finally {
+                sharedJobsViewModel.setLoadingMoreLocalJobs(false)
+            }
+        }
+    }
+
+    private suspend fun fetchJobsForTile(bounds: TileBounds): List<MapJobItem> {
+        logDebug(
+            "tileFetch bounds=(${bounds.minLat},${bounds.minLng})..(${bounds.maxLat},${bounds.maxLng})"
+        )
+
+        val nearbyJobs = SupabaseJobsService.getPlaceMapMarkersInBounds(
+            minLat = bounds.minLat,
+            minLng = bounds.minLng,
+            maxLat = bounds.maxLat,
+            maxLng = bounds.maxLng,
+        )
+        val result = nearbyJobs
+            .filter { it.latitude in bounds.minLat..bounds.maxLat && it.longitude in bounds.minLng..bounds.maxLng }
+            .map { it.toMapJobItem(region.latitude, region.longitude) }
+        logDebug("tileFetch response nearby=${nearbyJobs.size} inTile=${result.size}")
+        return result
+    }
+
+
+    private fun NearbyJob.toMapJobItem(distanceOriginLat: Double, distanceOriginLng: Double): MapJobItem {
+        return MapJobItem(
+            id = id,
+            title = title,
+            businessName = businessName,
+            description = description,
+            jobType = jobType,
+            payText = payText,
+            distanceText = formatDistance(distanceOriginLat, distanceOriginLng, latitude, longitude),
+            addressText = addressText,
+            whatsapp = whatsapp,
+            phone = phone,
+            expiresAt = expiresAt,
+            createdAt = createdAt,
+            latitude = latitude,
+            longitude = longitude,
+            placeId = placeId,
+        )
+    }
+
+    private fun LatLngBounds.toCameraViewport(zoom: Float): CameraViewport {
+        return CameraViewport(
+            zoom = zoom,
+            minLat = southwest.latitude,
+            minLng = southwest.longitude,
+            maxLat = northeast.latitude,
+            maxLng = northeast.longitude,
+        )
+    }
+
+    // ===================== UI FUNCTIONS =====================
+
+    private fun openPlaceSheet() {
+        view?.post {
+            applyPlaceSheetStateForDestination(sheetNavController?.currentDestination?.id ?: R.id.navigation_local)
+        }
+    }
+
+    private fun handlePlaceMarkerPress(placeMarker: MapJobItem) {
+        hideApplySheet()
+        placeSheetMode = PlaceSheetMode.PLACE
+        forcePlaceSheetHalfExpanded = true
+        mapNavView?.selectedItemId = R.id.navigation_local
+        viewLifecycleOwner.lifecycleScope.launch {
+            fetchLocalJobsForPlace(placeMarker)
+        }
+        view?.post {
+            openPlaceSheet()
+            placeSheetBehavior?.peekHeight = homePeekHeight()
+            placeSheetBehavior?.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            forcePlaceSheetHalfExpanded = false
+        }
+    }
+
+    private fun openJobApplySheet(job: MapJobItem) {
         sharedJobsViewModel.selectJob(job)
         if (childFragmentManager.findFragmentByTag(JobApplyBottomSheetFragment.TAG) == null) {
             childFragmentManager.beginTransaction()
                 .replace(R.id.apply_sheet_container, JobApplyBottomSheetFragment(), JobApplyBottomSheetFragment.TAG)
                 .commit()
         }
+        val insetsTop = ViewCompat.getRootWindowInsets(requireView())
+            ?.getInsets(WindowInsetsCompat.Type.systemBars())
+            ?.top
         allowApplySheetHide = false
         applySheetBehavior?.peekHeight = applyPeekHeight()
+        if (insetsTop != null) {
+            applySheetBehavior?.expandedOffset = insetsTop + expandedTopMargin()
+        }
         applySheetBehavior?.isHideable = false
         applySheetBehavior?.state = BottomSheetBehavior.STATE_HALF_EXPANDED
         backPressCallback.isEnabled = true
-        view?.post { openSheet() }
+        view?.post { openPlaceSheet() }
+    }
+
+    fun openApplySheetForJob(job: MapJobItem) {
+        lastCameraMoveWasGesture = false
+        googleMap?.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(LatLng(job.latitude, job.longitude), CURRENT_LOCATION_ZOOM)
+        )
+        openJobApplySheet(job)
+    }
+
+    fun focusMapOnJob(job: MapJobItem) {
+        val target = LatLng(job.latitude, job.longitude)
+        lastCameraMoveWasGesture = false
+        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(target, CURRENT_LOCATION_ZOOM))
+
+        placeSheetBehavior?.let { behavior ->
+            behavior.peekHeight = homePeekHeight()
+            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        collapseApplySheetToPeek(showHint = false)
     }
 
     fun hideApplySheet() {
         val behavior = applySheetBehavior ?: return
+        sharedJobsViewModel.clearSelectedJob()
+        backPressCallback.isEnabled = false
         if (behavior.state == BottomSheetBehavior.STATE_HIDDEN) return
         allowApplySheetHide = true
         behavior.isHideable = true
@@ -417,8 +771,17 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         collapseApplySheetToPeek(showHint = true)
     }
 
+    private fun collapsePlaceSheetToPeek() {
+        val behavior = placeSheetBehavior ?: return
+        if (behavior.state == BottomSheetBehavior.STATE_HIDDEN) return
+        if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) return
+        behavior.peekHeight = homePeekHeight()
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
     private fun collapseApplySheetToPeek(showHint: Boolean = false) {
         val behavior = applySheetBehavior ?: return
+        if (selectedJobOrNull() == null) return
         if (behavior.state == BottomSheetBehavior.STATE_HIDDEN) return
         if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) return
         if (showHint) showApplySheetAutoCollapseHint()
@@ -448,7 +811,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
     }
 
     internal fun selectJobForTest(job: MapJobItem) {
-        handleMarkerPress(job)
+        openJobApplySheet(job)
     }
 
     internal fun simulateMapInteractionForTest() {
@@ -495,21 +858,24 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             marker?.tag = job.id
         }
 
-        jobs.firstOrNull()?.let { first ->
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(first.latitude, first.longitude), CURRENT_LOCATION_ZOOM))
-        }
+        // Keep user camera position while panning; recenter only from explicit actions.
     }
 
     private fun setRefreshing(@Suppress("UNUSED_PARAMETER") value: Boolean) {
         // No pull-to-refresh UI on the map screen.
     }
 
-    private fun applySheetStateForDestination(destinationId: Int) {
-        val behavior = sheetBehavior ?: return
+    private fun applyPlaceSheetStateForDestination(destinationId: Int) {
+        val behavior = placeSheetBehavior ?: return
         when (destinationId) {
             R.id.navigation_local -> {
                 behavior.peekHeight = homePeekHeight()
-                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                behavior.state = if (forcePlaceSheetHalfExpanded || placeSheetMode == PlaceSheetMode.PLACE) {
+                    forcePlaceSheetHalfExpanded = false
+                    BottomSheetBehavior.STATE_HALF_EXPANDED
+                } else {
+                    BottomSheetBehavior.STATE_COLLAPSED
+                }
             }
 
             R.id.navigation_dashboard,
@@ -548,8 +914,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             return
         }
 
-        val mainSheetView = rootView.findViewById<View>(R.id.bottom_sheet)
-        val mainBehavior = sheetBehavior ?: return
+        val mainSheetView = rootView.findViewById<View>(R.id.place_bottom_sheet)
+        val mainBehavior = placeSheetBehavior ?: return
         updateMapControlsPosition(mainSheetView.top, mainBehavior)
     }
 
@@ -589,12 +955,25 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         }
     }
 
+    private fun setMapLoading(loading: Boolean) {
+        sharedJobsViewModel.setMapLoading(loading)
+    }
+
+    private fun logDebug(message: String) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, message)
+        }
+    }
+
     override fun onDestroyView() {
+        cameraIdleFetchJob?.cancel()
+        cameraIdleFetchJob = null
+        mapTileCache.clearAll()
         readyDelayRunnable?.let(mainHandler::removeCallbacks)
         readyDelayRunnable = null
-        sheetBehavior?.removeBottomSheetCallback(sheetCallback)
-        sheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
-        sheetBehavior = null
+        placeSheetBehavior?.removeBottomSheetCallback(placeSheetCallback)
+        placeSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        placeSheetBehavior = null
         applySheetCallback?.let { callback ->
             applySheetBehavior?.removeBottomSheetCallback(callback)
         }
@@ -605,6 +984,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         sheetNavController = null
         mapNavView = null
         mapControlsContainer = null
+        mapLoadingIndicator = null
         googleMap = null
         super.onDestroyView()
     }

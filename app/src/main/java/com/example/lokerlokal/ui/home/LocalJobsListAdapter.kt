@@ -36,7 +36,10 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale
 
-class LocalJobsListAdapter : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolder>() {
+class LocalJobsListAdapter(
+    private val onViewOnMapClicked: (MapJobItem) -> Unit = {},
+    private val onCardClicked: (MapJobItem) -> Unit = {},
+) : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolder>() {
 
     companion object {
         private const val TAG = "LocalJobsListAdapter"
@@ -46,7 +49,7 @@ class LocalJobsListAdapter : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolde
     }
 
     private val items = mutableListOf<MapJobItem>()
-    private val requestScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var requestScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val placeDetailsCache = mutableMapOf<String, BusinessPlaceDetails?>()
 
     fun submitItems(newItems: List<MapJobItem>) {
@@ -58,7 +61,7 @@ class LocalJobsListAdapter : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolde
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_local_job_card, parent, false)
-        return ViewHolder(view, requestScope, placeDetailsCache)
+        return ViewHolder(view, { requestScope }, placeDetailsCache, onViewOnMapClicked, onCardClicked)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -70,6 +73,14 @@ class LocalJobsListAdapter : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolde
         super.onViewRecycled(holder)
     }
 
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        // Ensure scope is active when the RecyclerView is (re-)attached
+        if (!requestScope.coroutineContext[kotlinx.coroutines.Job]!!.isActive) {
+            requestScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+        }
+    }
+
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         requestScope.cancel()
         super.onDetachedFromRecyclerView(recyclerView)
@@ -79,8 +90,10 @@ class LocalJobsListAdapter : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolde
 
     class ViewHolder(
         itemView: View,
-        private val requestScope: CoroutineScope,
+        private val scopeProvider: () -> CoroutineScope,
         private val placeDetailsCache: MutableMap<String, BusinessPlaceDetails?>,
+        private val onViewOnMapClicked: (MapJobItem) -> Unit,
+        private val onCardClicked: (MapJobItem) -> Unit,
     ) : RecyclerView.ViewHolder(itemView) {
         private val image: ImageView = itemView.findViewById(R.id.job_image)
         private val title: TextView = itemView.findViewById(R.id.job_title)
@@ -89,28 +102,29 @@ class LocalJobsListAdapter : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolde
         private val jobType: TextView = itemView.findViewById(R.id.job_type)
         private val payText: TextView = itemView.findViewById(R.id.job_pay_text)
         private val distance: TextView = itemView.findViewById(R.id.job_distance)
-        private val address: TextView = itemView.findViewById(R.id.job_address)
-        private val whatsapp: TextView = itemView.findViewById(R.id.job_whatsapp)
-        private val phone: TextView = itemView.findViewById(R.id.job_phone)
+//        private val address: TextView = itemView.findViewById(R.id.job_address)
         private val expiresAt: TextView = itemView.findViewById(R.id.job_expires_at)
+        private val viewOnMapButton: View = itemView.findViewById(R.id.button_view_on_map)
 
         private var activePlaceJob: Job? = null
+        private var boundItemId: String? = null   // track which item this ViewHolder is showing
 
         fun bind(item: MapJobItem) {
             activePlaceJob?.cancel()
+            boundItemId = item.id
             Glide.with(itemView.context).clear(image)
             image.setImageDrawable(null)
 
-            title.text = item.title
-            businessName.text = item.businessName
+            businessName.text = item.businessName.ifBlank { itemView.context.getString(R.string.unknown_business) }
+            title.text = buildSubtitle(item)
             description.text = item.description.ifBlank { "-" }
             jobType.text = item.jobType.ifBlank { "-" }
             payText.text = item.payText.ifBlank { "-" }
             distance.text = item.distanceText.ifBlank { "-" }
-            address.text = item.addressText.ifBlank { "-" }
-            whatsapp.text = item.whatsapp.ifBlank { "-" }
-            phone.text = item.phone.ifBlank { "-" }
+//            address.text = item.addressText.ifBlank { "-" }
             expiresAt.text = formatExpiry(item.expiresAt)
+            viewOnMapButton.setOnClickListener { onViewOnMapClicked(item) }
+            itemView.setOnClickListener { onCardClicked(item) }
 
             loadBusinessImage(item)
         }
@@ -118,14 +132,15 @@ class LocalJobsListAdapter : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolde
         fun clear() {
             activePlaceJob?.cancel()
             activePlaceJob = null
+            boundItemId = null
             Glide.with(itemView.context).clear(image)
         }
 
         private fun loadBusinessImage(item: MapJobItem) {
-            val placeId = item.businessPlaceId.trim()
+            val placeId = item.placeId.trim()
             if (placeId.isBlank()) {
                 if (BuildConfig.DEBUG) {
-                    Log.d(TAG, "No business_place_id for jobId=${item.id}; using gradient background only")
+                    Log.d(TAG, "No place_id for jobId=${item.id}; using gradient background only")
                 }
                 image.setImageDrawable(null)
                 return
@@ -143,25 +158,34 @@ class LocalJobsListAdapter : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolde
                 return
             }
 
-            activePlaceJob = requestScope.launch {
+            val capturedItemId = item.id
+            activePlaceJob = scopeProvider().launch {
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Fetching place details for jobId=${item.id}, placeId=$placeId")
                 }
                 val details = GooglePlacesService.getPlaceDetails(placeId)
                 placeDetailsCache[placeId] = details
 
-                if (details != null && bindingAdapterPosition != RecyclerView.NO_POSITION) {
+                // Guard: only apply if this ViewHolder is still showing the same item
+                if (details != null
+                    && boundItemId == capturedItemId
+                    && bindingAdapterPosition != RecyclerView.NO_POSITION
+                ) {
                     applyPlaceDetails(item, details)
                 } else {
-                    image.setImageDrawable(null)
+                    if (boundItemId == capturedItemId) image.setImageDrawable(null)
                 }
             }
         }
 
         private fun applyPlaceDetails(item: MapJobItem, details: BusinessPlaceDetails) {
-            if (details.formattedAddress.isNotBlank()) {
-                address.text = details.formattedAddress
+            if (details.displayName.isNotBlank()) {
+                businessName.text = details.displayName
             }
+
+//            if (details.formattedAddress.isNotBlank()) {
+//                address.text = details.formattedAddress
+//            }
 
             if (!details.photoUrl.isNullOrBlank()) {
                 if (BuildConfig.DEBUG) {
@@ -213,8 +237,14 @@ class LocalJobsListAdapter : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolde
             }
         }
 
+        private fun buildSubtitle(item: MapJobItem): String {
+            val titleText = item.title.ifBlank { itemView.context.getString(R.string.unknown_job_title) }
+            val typeText = item.jobType.trim()
+            return if (typeText.isBlank()) titleText else "$titleText • $typeText"
+        }
+
         private fun formatExpiry(rawValue: String): String {
-            if (rawValue.isBlank()) return "Batas Akhir: -"
+            if (rawValue.isBlank()) return "-"
 
             val normalized = rawValue.trim()
             val userZoneId = ZoneId.systemDefault()
@@ -222,27 +252,27 @@ class LocalJobsListAdapter : RecyclerView.Adapter<LocalJobsListAdapter.ViewHolde
             runCatching {
                 val instant = Instant.parse(normalized)
                 val zonedDt = instant.atZone(userZoneId)
-                return "Batas Akhir: ${formatExpiryDateTime(zonedDt)}"
+                return formatExpiryDateTime(zonedDt)
             }
 
             runCatching {
                 val offsetDateTime = OffsetDateTime.parse(normalized)
                 val zonedDt = offsetDateTime.atZoneSameInstant(userZoneId)
-                return "Batas Akhir: ${formatExpiryDateTime(zonedDt)}"
+                return formatExpiryDateTime(zonedDt)
             }
 
             runCatching {
                 val localDateTime = LocalDateTime.parse(normalized, isoLocalInputFormatter)
                 val zonedDateTime = localDateTime.atZone(utcZoneId).withZoneSameInstant(userZoneId)
-                return "Batas Akhir: ${formatExpiryDateTime(zonedDateTime)}"
+                return formatExpiryDateTime(zonedDateTime)
             }
 
             return try {
                 val localDateTime = LocalDateTime.parse(normalized)
                 val zonedDateTime: ZonedDateTime = localDateTime.atZone(utcZoneId).withZoneSameInstant(userZoneId)
-                "Batas Akhir: ${formatExpiryDateTime(zonedDateTime)}"
+                formatExpiryDateTime(zonedDateTime)
             } catch (_: DateTimeParseException) {
-                "Batas Akhir: $normalized"
+                normalized
             }
         }
 

@@ -93,7 +93,7 @@ class MapFragmentSheetBehaviorTest {
 
     private fun fakeJob(): MapJobItem =
         MapJobItem(
-            id = 999L,
+            id = "999",
             title = "Kasir",
             businessName = "Warung Uji",
             description = "Test job",
@@ -107,7 +107,7 @@ class MapFragmentSheetBehaviorTest {
             createdAt = "2026-01-01",
             latitude = -6.2,
             longitude = 106.8,
-            businessPlaceId = "place-id-test",
+            placeId = "place-id-test",
         )
 }
 
