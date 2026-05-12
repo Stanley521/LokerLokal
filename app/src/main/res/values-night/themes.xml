@@ -4,11 +4,15 @@
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primary_main</item>
         <item name="colorPrimaryVariant">@color/primary_dark</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/text_primary</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/warm_accent</item>
         <item name="colorSecondaryVariant">@color/soft_accent</item>
         <item name="colorOnSecondary">@color/text_primary</item>
+        <!-- Background for dark mode -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">#1E293B</item>
+        <item name="colorOnSurface">@color/text_primary</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>

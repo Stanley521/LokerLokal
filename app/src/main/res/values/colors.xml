@@ -20,6 +20,7 @@
 
     <!-- Background & Surface -->
     <color name="background">#F8FAFC</color>
+    <color name="background_theme">#E6FAFA</color>
     <color name="divider">#CBD5E1</color>
 
     <!-- Accent Colors -->

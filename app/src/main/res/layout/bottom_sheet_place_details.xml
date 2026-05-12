@@ -15,7 +15,7 @@
     <LinearLayout
         android:id="@+id/drag_handle_header"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="24dp"
         android:background="@android:color/transparent"
         android:gravity="center"
         android:orientation="horizontal">
@@ -27,13 +27,6 @@
             android:background="@drawable/drag_handle" />
 
     </LinearLayout>
-
-    <!-- Divider -->
-    <View
-        android:id="@+id/drag_handle_divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/place_sheet_nav_host_fragment"

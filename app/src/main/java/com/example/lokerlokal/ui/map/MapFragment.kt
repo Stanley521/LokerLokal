@@ -1,6 +1,7 @@
 package com.example.lokerlokal.ui.map
 
 import android.Manifest
+import android.content.res.Configuration
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -19,6 +20,8 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import android.util.Log
+import com.google.android.gms.maps.model.MapStyleOptions
+import android.content.res.Resources
 import com.example.lokerlokal.BuildConfig
 import com.example.lokerlokal.R
 import com.example.lokerlokal.data.remote.NearbyJob
@@ -290,6 +293,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync { map ->
             googleMap = map
+            applyMapStyleSafely(map)
             updateMyLocationLayer()
             map.uiSettings.isZoomControlsEnabled = false
             map.uiSettings.isZoomGesturesEnabled = true
@@ -957,6 +961,46 @@ class MapFragment : Fragment(R.layout.fragment_map) {
 
     private fun setMapLoading(loading: Boolean) {
         sharedJobsViewModel.setMapLoading(loading)
+    }
+
+    private fun applyMapStyleSafely(map: GoogleMap) {
+        val uiModeMask = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        val preferredStyle = if (uiModeMask == Configuration.UI_MODE_NIGHT_YES) {
+            R.raw.map_style_tint_night
+        } else {
+            R.raw.map_style_tint_day
+        }
+
+        try {
+            val applied = map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(requireContext(), preferredStyle)
+            )
+            if (!applied) {
+                logDebug("mapStyle apply failed for preferred style=$preferredStyle; trying fallback")
+                applyFallbackMapStyle(map)
+            }
+        } catch (_: Resources.NotFoundException) {
+            logDebug("mapStyle preferred resource not found style=$preferredStyle; trying fallback")
+            applyFallbackMapStyle(map)
+        } catch (error: Exception) {
+            logDebug("mapStyle preferred parse/apply error=${error.message}; trying fallback")
+            applyFallbackMapStyle(map)
+        }
+    }
+
+    private fun applyFallbackMapStyle(map: GoogleMap) {
+        try {
+            val fallbackApplied = map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style_tint)
+            )
+            if (!fallbackApplied) {
+                logDebug("mapStyle fallback apply failed; using Google default style")
+            }
+        } catch (_: Resources.NotFoundException) {
+            logDebug("mapStyle fallback resource not found; using Google default style")
+        } catch (error: Exception) {
+            logDebug("mapStyle fallback parse/apply error=${error.message}; using Google default style")
+        }
     }
 
     private fun logDebug(message: String) {

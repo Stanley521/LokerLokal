@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Night Mode Colors -->
+    <!-- Primary colors with dark mode adjustments -->
+    <color name="primary_main">#00B3B8</color>
+    <color name="primary_dark">#008A8F</color>
+    <color name="primary_light">#1A3F3E</color>
+
+    <!-- Text Colors for dark background -->
+    <color name="text_primary">#F1F5F9</color>
+    <color name="text_secondary">#CBD5E1</color>
+
+    <!-- Background & Surface for dark mode -->
+    <color name="background">#0F172A</color>
+    <color name="divider">#334155</color>
+
+    <!-- Accent Colors -->
+    <color name="warm_accent">#FFA500</color>
+    <color name="soft_accent">#8B5A3C</color>
+
+    <!-- Status Colors -->
+    <color name="success">#10B981</color>
+    <color name="warning">#F59E0B</color>
+    <color name="error">#F87171</color>
+    <color name="info">#06B6D4</color>
+
+    <!-- Gradient Start/End for dark mode -->
+    <color name="gradient_primary_start">#00B3B8</color>
+    <color name="gradient_primary_end">#06B6D4</color>
+    <color name="gradient_light_start">#1A3F3E</color>
+    <color name="gradient_light_end">#0F172A</color>
+</resources>
+
