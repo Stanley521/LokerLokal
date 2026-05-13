@@ -93,6 +93,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/background"
             android:orientation="vertical">
 
             <LinearLayout
@@ -114,9 +115,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:textColor="@color/primary_light"
+                    android:textColor="@color/primary_main"
                     android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    />
 
                 <TextView
                     android:id="@+id/job_type"
@@ -175,11 +177,11 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_view_on_map"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:backgroundTint="@color/gradient_light_end"
+                    android:background="@drawable/bg_primary_gradient_button"
+                    android:backgroundTint="@null"
                     android:elevation="0dp"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
@@ -187,6 +189,7 @@
                     android:text="@string/local_job_view_on_map"
                     android:textAllCaps="false"
                     android:textColor="@color/text_primary"
+                    app:backgroundTint="@null"
                     app:cornerRadius="14dp"
                     app:elevation="0dp"
                     app:icon="@drawable/ic_location_on_24"

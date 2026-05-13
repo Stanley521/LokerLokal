@@ -45,6 +45,7 @@ import kotlin.math.roundToInt
 import com.example.lokerlokal.ui.map.cache.CameraViewport
 import com.example.lokerlokal.ui.map.cache.InMemoryTileCacheManager
 import com.example.lokerlokal.ui.map.cache.TileBounds
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 class MapFragment : Fragment(R.layout.fragment_map) {
 
@@ -158,15 +159,12 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             mapLoadingIndicator?.visibility = if (loading) View.VISIBLE else View.GONE
         }
         view.findViewById<ImageButton>(R.id.button_current_location).setOnClickListener {
-            onMapInteractionCollapseApplySheet()
             initLocation()
         }
         view.findViewById<ImageButton>(R.id.button_zoom_in).setOnClickListener {
-            onMapInteractionCollapseApplySheet()
             googleMap?.animateCamera(CameraUpdateFactory.zoomIn())
         }
         view.findViewById<ImageButton>(R.id.button_zoom_out).setOnClickListener {
-            onMapInteractionCollapseApplySheet()
             googleMap?.animateCamera(CameraUpdateFactory.zoomOut())
         }
 
@@ -300,12 +298,11 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             map.setOnCameraMoveStartedListener { reason ->
                 lastCameraMoveWasGesture = reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
                 if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-                    onMapInteractionCollapseApplySheet()
                     collapsePlaceSheetToPeek()
                 }
             }
             map.setOnMapClickListener {
-                onMapInteractionCollapseApplySheet()
+//                onMapInteractionCollapseApplySheet()
             }
             map.setOnCameraIdleListener {
                 cameraIdleFetchJob?.cancel()
@@ -735,7 +732,7 @@ class MapFragment : Fragment(R.layout.fragment_map) {
             applySheetBehavior?.expandedOffset = insetsTop + expandedTopMargin()
         }
         applySheetBehavior?.isHideable = false
-        applySheetBehavior?.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        applySheetBehavior?.state = BottomSheetBehavior.STATE_EXPANDED
         backPressCallback.isEnabled = true
         view?.post { openPlaceSheet() }
     }
@@ -858,6 +855,8 @@ class MapFragment : Fragment(R.layout.fragment_map) {
                 MarkerOptions()
                     .position(LatLng(job.latitude, job.longitude))
                     .title(job.title)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
+//                        HUE_RED, HUE_ORANGE, HUE_YELLOW, HUE_GREEN, HUE_CYAN, HUE_BLUE, HUE_MAGENTA
             )
             marker?.tag = job.id
         }

@@ -23,6 +23,11 @@
     <color name="background_theme">#E6FAFA</color>
     <color name="divider">#CBD5E1</color>
 
+    <!-- Scrim Colors -->
+    <color name="scrim_start">#F5FFFFFF</color>
+    <color name="scrim_center">#99FFFFFF</color>
+    <color name="scrim_end">#00FFFFFF</color>
+
     <!-- Accent Colors -->
     <color name="warm_accent">#FF9F1C</color>
     <color name="soft_accent">#FFE8CC</color>
@@ -39,4 +44,3 @@
     <color name="gradient_light_start">#E6FAFA</color>
     <color name="gradient_light_end">#F8FAFC</color>
 </resources>
-

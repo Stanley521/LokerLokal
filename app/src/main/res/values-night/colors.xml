@@ -14,6 +14,11 @@
     <color name="background">#0F172A</color>
     <color name="divider">#334155</color>
 
+    <!-- Scrim Colors -->
+    <color name="scrim_start">#F50F172A</color>
+    <color name="scrim_center">#990F172A</color>
+    <color name="scrim_end">#000F172A</color>
+
     <!-- Accent Colors -->
     <color name="warm_accent">#FFA500</color>
     <color name="soft_accent">#8B5A3C</color>
@@ -30,4 +35,3 @@
     <color name="gradient_light_start">#1A3F3E</color>
     <color name="gradient_light_end">#0F172A</color>
 </resources>
-
