@@ -92,13 +92,13 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation("androidx.fragment:fragment-testing:1.8.6")
     debugImplementation("androidx.fragment:fragment-testing:1.8.6")
 }
 
@@ -112,4 +112,3 @@ tasks.matching { it.name == "preBuild" }.configureEach {
         }
     }
 }
-
