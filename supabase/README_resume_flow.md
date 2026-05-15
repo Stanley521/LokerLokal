@@ -9,13 +9,19 @@ Run SQL in Supabase SQL Editor:
 -- use file: supabase/resume_schema.sql
 ```
 
+If you are enabling real login, also run:
+
+```sql
+-- use file: supabase/auth_schema.sql
+```
+
 ## 2) Notes
 
 - PDF max size is limited to 500KB in app validation.
 - Resume metadata is stored in `public.resume_files`.
 - Resume files are stored in bucket `resumes`.
-- Current policies are MVP-open (`anon` + `authenticated`) for faster iteration.
-  Tighten policies once auth is enabled.
+- Resume upload now expects a signed-in Supabase session.
+- Current policies are auth-aware and should be used together with the new client-side login flow.
 
 ## 3) WhatsApp behavior
 

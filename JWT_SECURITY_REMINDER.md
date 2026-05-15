@@ -5,21 +5,22 @@
 ### Current Status
 - **Location**: `supabase/config.toml`
 - **Edge Function**: `google-place-details`
-- **Current Setting**: `verify_jwt = false` ❌
-- **Status**: Testing/Development only
+- **Current Setting**: `verify_jwt = false` ⚠️
+- **Status**: Anonymous access still allowed for compatibility
 
 ### What This Means
-- ✅ During development and testing: JWT verification is disabled for easier testing
-- ❌ Before production: JWT verification MUST be re-enabled
-- ⚠️ Currently: Anyone with your edge function URL can call it without authentication
+- ✅ The app can keep calling `google-place-details` without breaking today
+- ⚠️ The function is still public until the client starts sending JWTs
+- ✅ The auth foundation is ready in `supabase/auth_schema.sql`
 
 ### Pre-Production Checklist
 ```
 BEFORE RELEASING TO PRODUCTION:
 
-□ Enable JWT verification in supabase/config.toml
-  Change: verify_jwt = false
-  To:     verify_jwt = true
+□ Verify the Android app sends `Authorization: Bearer <user_access_token>`
+□ Confirm the `public.profiles` trigger creates rows for new users
+□ Validate RLS policies on user-owned tables
+□ Switch `verify_jwt = true` before shipping protected edge functions
 
 □ Run edge function tests with proper JWT tokens
 □ Verify authentication flow works end-to-end
@@ -35,11 +36,17 @@ BEFORE RELEASING TO PRODUCTION:
 
 1. Open `supabase/config.toml`
 2. Locate the `[functions.google-place-details]` section
-3. Change `verify_jwt = false` to `verify_jwt = true`
+3. Change `verify_jwt = false` to `verify_jwt = true` when the app sends JWTs
 4. Save and sync with Supabase:
    ```bash
    supabase functions deploy google-place-details
    ```
+
+### Auth schema reference
+
+- `supabase/auth_schema.sql` creates the `public.profiles` table
+- It auto-creates profiles from `auth.users`
+- It includes helper functions for `auth.uid()` and `auth.jwt()`
 
 ### Other Security Reminders
 

@@ -15,7 +15,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/white"
+            app:cardBackgroundColor="@color/background"
             app:cardCornerRadius="20dp"
             app:strokeColor="@color/divider"
             app:strokeWidth="1dp">
@@ -51,6 +51,8 @@
                     android:layout_marginTop="4dp"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
+
+                <include layout="@layout/component_view_on_map_button" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -58,7 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            app:cardBackgroundColor="@color/white"
+            app:cardBackgroundColor="@color/background"
             app:cardCornerRadius="20dp"
             app:strokeColor="@color/divider"
             app:strokeWidth="1dp">

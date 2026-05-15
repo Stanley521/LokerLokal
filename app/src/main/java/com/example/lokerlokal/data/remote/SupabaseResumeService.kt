@@ -1,5 +1,6 @@
 package com.example.lokerlokal.data.remote
 
+import com.example.lokerlokal.data.auth.SupabaseSession
 import com.example.lokerlokal.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -23,10 +24,11 @@ object SupabaseResumeService {
     private const val RESUME_TABLE = "resume_files"
     private const val RESUME_BUCKET = "resumes"
 
-    suspend fun getLatestResume(userKey: String): ResumeMeta? = withContext(Dispatchers.IO) {
+    suspend fun getLatestResume(session: SupabaseSession): ResumeMeta? = withContext(Dispatchers.IO) {
         val supabaseUrl = BuildConfig.SUPABASE_URL.trim().trimEnd('/')
         val supabaseAnonKey = BuildConfig.SUPABASE_ANON_KEY.trim()
-        if (supabaseUrl.isBlank() || supabaseAnonKey.isBlank() || userKey.isBlank()) return@withContext null
+        val userKey = session.user.id.trim()
+        if (supabaseUrl.isBlank() || supabaseAnonKey.isBlank() || userKey.isBlank() || session.accessToken.isBlank()) return@withContext null
 
         val encodedUserKey = URLEncoder.encode(userKey, Charsets.UTF_8.name())
         val endpoint = URL(
@@ -39,7 +41,7 @@ object SupabaseResumeService {
             readTimeout = 20_000
             doInput = true
             setRequestProperty("apikey", supabaseAnonKey)
-            setRequestProperty("Authorization", "Bearer $supabaseAnonKey")
+            setRequestProperty("Authorization", "Bearer ${session.accessToken}")
             setRequestProperty("Accept", "application/json")
         }
 
@@ -68,14 +70,15 @@ object SupabaseResumeService {
     }
 
     suspend fun uploadResume(
-        userKey: String,
+        session: SupabaseSession,
         fileName: String,
         mimeType: String,
         bytes: ByteArray,
     ): ResumeMeta = withContext(Dispatchers.IO) {
         val supabaseUrl = BuildConfig.SUPABASE_URL.trim().trimEnd('/')
         val supabaseAnonKey = BuildConfig.SUPABASE_ANON_KEY.trim()
-        if (supabaseUrl.isBlank() || supabaseAnonKey.isBlank() || userKey.isBlank()) {
+        val userKey = session.user.id.trim()
+        if (supabaseUrl.isBlank() || supabaseAnonKey.isBlank() || userKey.isBlank() || session.accessToken.isBlank()) {
             throw IllegalStateException("Missing Supabase configuration or user key")
         }
 
@@ -92,7 +95,7 @@ object SupabaseResumeService {
             doInput = true
             doOutput = true
             setRequestProperty("apikey", supabaseAnonKey)
-            setRequestProperty("Authorization", "Bearer $supabaseAnonKey")
+            setRequestProperty("Authorization", "Bearer ${session.accessToken}")
             setRequestProperty("Content-Type", mimeType)
             setRequestProperty("x-upsert", "true")
         }
@@ -110,15 +113,15 @@ object SupabaseResumeService {
             uploadConnection.disconnect()
         }
 
-        upsertResumeMeta(userKey, fileName, filePath, bytes.size.toLong())
-        return@withContext getLatestResume(userKey)
+        upsertResumeMeta(session, fileName, filePath, bytes.size.toLong())
+        return@withContext getLatestResume(session)
             ?: throw IOException("Resume uploaded but metadata was not found")
     }
 
-    suspend fun downloadResume(filePath: String): ByteArray = withContext(Dispatchers.IO) {
+    suspend fun downloadResume(session: SupabaseSession, filePath: String): ByteArray = withContext(Dispatchers.IO) {
         val supabaseUrl = BuildConfig.SUPABASE_URL.trim().trimEnd('/')
         val supabaseAnonKey = BuildConfig.SUPABASE_ANON_KEY.trim()
-        if (supabaseUrl.isBlank() || supabaseAnonKey.isBlank() || filePath.isBlank()) {
+        if (supabaseUrl.isBlank() || supabaseAnonKey.isBlank() || filePath.isBlank() || session.accessToken.isBlank()) {
             throw IllegalStateException("Missing Supabase configuration or file path")
         }
 
@@ -132,7 +135,7 @@ object SupabaseResumeService {
             readTimeout = 20_000
             doInput = true
             setRequestProperty("apikey", supabaseAnonKey)
-            setRequestProperty("Authorization", "Bearer $supabaseAnonKey")
+            setRequestProperty("Authorization", "Bearer ${session.accessToken}")
         }
 
         try {
@@ -148,13 +151,14 @@ object SupabaseResumeService {
     }
 
     private fun upsertResumeMeta(
-        userKey: String,
+        session: SupabaseSession,
         fileName: String,
         filePath: String,
         sizeBytes: Long,
     ) {
         val supabaseUrl = BuildConfig.SUPABASE_URL.trim().trimEnd('/')
         val supabaseAnonKey = BuildConfig.SUPABASE_ANON_KEY.trim()
+        val userKey = session.user.id.trim()
 
         val endpoint = URL("$supabaseUrl/rest/v1/$RESUME_TABLE")
         val payload = JSONObject()
@@ -172,7 +176,7 @@ object SupabaseResumeService {
             doOutput = true
             setRequestProperty("Content-Type", "application/json")
             setRequestProperty("apikey", supabaseAnonKey)
-            setRequestProperty("Authorization", "Bearer $supabaseAnonKey")
+            setRequestProperty("Authorization", "Bearer ${session.accessToken}")
             setRequestProperty("Prefer", "resolution=merge-duplicates,return=minimal")
         }
 

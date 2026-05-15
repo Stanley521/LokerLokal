@@ -53,6 +53,22 @@
     <string name="map_zoom_out">Zoom out</string>
     <!-- Dashboard -->
     <string name="dashboard_title">Profil &amp; Resume</string>
+    <string name="dashboard_auth_section">Supabase Login</string>
+    <string name="dashboard_auth_email">Email</string>
+    <string name="dashboard_auth_password">Password</string>
+    <string name="dashboard_auth_full_name">Nama Lengkap</string>
+    <string name="dashboard_sign_in">Sign In</string>
+    <string name="dashboard_sign_up">Sign Up</string>
+    <string name="dashboard_sign_out">Sign Out</string>
+    <string name="dashboard_signed_in_as">Signed in as: %1$s</string>
+    <string name="dashboard_sign_in_prompt">Sign in to upload and sync your resume.</string>
+    <string name="dashboard_sign_in_success">Berhasil login.</string>
+    <string name="dashboard_sign_up_success">Akun berhasil dibuat dan login.</string>
+    <string name="dashboard_sign_out_success">Berhasil keluar.</string>
+    <string name="dashboard_sign_in_required">Silakan sign in terlebih dahulu di tab Dashboard.</string>
+    <string name="dashboard_missing_auth_fields">Email dan password harus diisi.</string>
+    <string name="dashboard_missing_full_name">Nama lengkap opsional saat sign up.</string>
+    <string name="dashboard_auth_error">Autentikasi gagal.</string>
     <string name="dashboard_resume_section">Resume Saya</string>
     <string name="dashboard_tips_title">Tips Melamar Kerja</string>
     <string name="dashboard_tips_body">• Pastikan resume Anda selalu terbaru.\n• Sertakan pengalaman dan keahlian yang relevan.\n• Perhatikan batas waktu pendaftaran lowongan.\n• Hubungi perusahaan melalui WhatsApp dengan sopan dan profesional.</string>

@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.lokerlokal.R
 import com.example.lokerlokal.data.remote.GooglePlacesService
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 
 class JobCompanyTabFragment : Fragment() {
@@ -36,6 +37,7 @@ class JobCompanyTabFragment : Fragment() {
         val companyName = view.findViewById<TextView>(R.id.company_name)
         val companyAddress = view.findViewById<TextView>(R.id.company_address)
         val loading = view.findViewById<ProgressBar>(R.id.company_loading)
+        val viewOnMapButton = view.findViewById<MaterialButton>(R.id.button_view_on_map)
         val photosList = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.company_photos_list)
         photosList.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         photosList.adapter = photosAdapter
@@ -44,6 +46,10 @@ class JobCompanyTabFragment : Fragment() {
             if (job == null) return@observe
             companyName.text = job.businessName.ifBlank { getString(R.string.unknown_business) }
             companyAddress.text = job.addressText.ifBlank { job.placeId }
+            viewOnMapButton.setOnClickListener {
+                (parentFragment?.parentFragment as? MapFragment)?.focusMapOnJob(job)
+            }
+
             val placeId = job.placeId.trim()
             if (placeId.isBlank()) {
                 loading.visibility = View.GONE

@@ -1,13 +1,10 @@
 package com.example.lokerlokal.ui.map
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.lokerlokal.R
+import com.example.lokerlokal.data.auth.SupabaseAuthStore
 import com.example.lokerlokal.data.remote.SupabaseResumeService
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
@@ -84,7 +82,6 @@ class JobApplyTabFragment : Fragment() {
             return
         }
 
-        selectedPdfUri = uri
         val name = queryDisplayName(uri).ifBlank { "resume.pdf" }
         val bytes = requireContext().contentResolver.openInputStream(uri)?.use { it.readBytes() }
         if (bytes == null || bytes.isEmpty()) {
@@ -92,11 +89,17 @@ class JobApplyTabFragment : Fragment() {
             return
         }
 
+        val session = SupabaseAuthStore.loadSession(requireContext())
+        if (session == null) {
+            Toast.makeText(requireContext(), getString(R.string.dashboard_sign_in_required), Toast.LENGTH_LONG).show()
+            return
+        }
+
         lifecycleScope.launch {
             uploadButton.isEnabled = false
             val uploaded = runCatching {
                 SupabaseResumeService.uploadResume(
-                    userKey = resolveUserKey(requireContext()),
+                    session = session,
                     fileName = name,
                     mimeType = "application/pdf",
                     bytes = bytes,
@@ -105,6 +108,7 @@ class JobApplyTabFragment : Fragment() {
             uploadButton.isEnabled = true
 
             uploaded.onSuccess {
+                selectedPdfUri = uri
                 Toast.makeText(requireContext(), getString(R.string.resume_uploaded_success), Toast.LENGTH_SHORT).show()
             }.onFailure { error ->
                 Toast.makeText(requireContext(), error.message ?: getString(R.string.resume_upload_failed), Toast.LENGTH_LONG).show()
@@ -179,9 +183,4 @@ class JobApplyTabFragment : Fragment() {
         return ""
     }
 
-    @SuppressLint("HardwareIds")
-    private fun resolveUserKey(context: Context): String {
-        val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-        return androidId?.takeIf { it.isNotBlank() } ?: "anonymous-user"
-    }
 }
